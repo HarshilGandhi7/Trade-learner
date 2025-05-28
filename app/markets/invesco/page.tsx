@@ -32,8 +32,6 @@ export default function NasdaqPage() {
   const PRICE_CHANGE_THRESHOLD = 0.05;
   const [fiftyTwoWeekHigh, setFiftyTwoWeekHigh] = useState<number | null>(null);
   const [fiftyTwoWeekLow, setFiftyTwoWeekLow] = useState<number | null>(null);
-  const fiftyTwoWeekHighRef = useRef<number | null>(null);
-  const fiftyTwoWeekLowRef = useRef<number | null>(null);
   const Name = "Invesco QQQ Trust – Nasdaq-100 ETF";
   const [marketStatus, setMarketStatus] = useState<string>(
     "Checking market status..."

@@ -65,7 +65,7 @@ export default function Home() {
               Nasdaq 100 ETF
             </Link>
             <Link
-              href="/markets/dow"
+              href="/markets/gold-etf"
               className="group flex items-center px-2 py-2 text-base font-medium rounded-md text-zinc-300 hover:bg-zinc-700 hover:text-white"
             >
               <svg
@@ -82,7 +82,7 @@ export default function Home() {
                   d="M2.25 18L9 11.25l4.306 4.307a11.95 11.95 0 015.814-5.519l2.74-1.22m0 0l-5.94-2.28m5.94 2.28l-2.28 5.941"
                 />
               </svg>
-              Dow Jones
+              GOLD-ETF
             </Link>
             <Link
               href="/markets/sp500"
@@ -657,13 +657,6 @@ export default function Home() {
                   </a>
                 </div>
               </div>
-            </div>
-
-            {/* Copyright */}
-            <div className="mt-12 border-t border-zinc-800 pt-8">
-              <p className="text-zinc-400 text-sm text-center">
-                © 2025 TradeLearner. All rights reserved.
-              </p>
             </div>
           </div>
         </footer>

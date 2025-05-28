@@ -14,7 +14,7 @@ type IndexData = {
   low: number;
 };
 
-export default function NasdaqPage() {
+export default function SP500() {
   const [data, setData] = useState<IndexData | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -32,8 +32,6 @@ export default function NasdaqPage() {
   const PRICE_CHANGE_THRESHOLD = 0.05;
   const [fiftyTwoWeekHigh, setFiftyTwoWeekHigh] = useState<number | null>(null);
   const [fiftyTwoWeekLow, setFiftyTwoWeekLow] = useState<number | null>(null);
-  const fiftyTwoWeekHighRef = useRef<number | null>(null);
-  const fiftyTwoWeekLowRef = useRef<number | null>(null);
   const Name = "SPDR S&P 500 ETF Trust (SPY)";
   const [marketStatus, setMarketStatus] = useState<string>(
     "Checking market status..."

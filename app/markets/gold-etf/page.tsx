@@ -14,7 +14,7 @@ type IndexData = {
   low: number;
 };
 
-export default function DowPage() {
+export default function DowJones() {
   const [data, setData] = useState<IndexData | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -32,9 +32,7 @@ export default function DowPage() {
   const PRICE_CHANGE_THRESHOLD = 0.05;
   const [fiftyTwoWeekHigh, setFiftyTwoWeekHigh] = useState<number | null>(null);
   const [fiftyTwoWeekLow, setFiftyTwoWeekLow] = useState<number | null>(null);
-  const fiftyTwoWeekHighRef = useRef<number | null>(null);
-  const fiftyTwoWeekLowRef = useRef<number | null>(null);
-  const Name = "SPDR Dow Jones Industrial Average ETF Trust (DIA)";
+  const Name = "SPDR Gold Shares ETF (GLD)";
   const [marketStatus, setMarketStatus] = useState<string>(
     "Checking market status..."
   );
@@ -136,7 +134,7 @@ export default function DowPage() {
       }
 
       const response = await fetch(
-        `/api/stock?interval=${interval}&range=${range}&symbol=${process.env.NEXT_PUBLIC_DOW_SYMBOL}`
+        `/api/stock?interval=${interval}&range=${range}&symbol=${process.env.NEXT_PUBLIC_GOLD_ETF_SYMBOL}`
       );
 
       if (!response.ok) {
@@ -193,7 +191,7 @@ export default function DowPage() {
       try {
         setLoading(true);
         const response = await axios.get(
-          `https://finnhub.io/api/v1/quote?symbol=${process.env.NEXT_PUBLIC_DOW_SYMBOL}&token=${process.env.NEXT_PUBLIC_DOW_API_KEY}`
+          `https://finnhub.io/api/v1/quote?symbol=${process.env.NEXT_PUBLIC_GOLD_ETF_SYMBOL}&token=${process.env.NEXT_PUBLIC_GOLD_ETF_API_KEY}`
         );
         const quoteData = response.data;
         setData({
@@ -218,14 +216,14 @@ export default function DowPage() {
       const isOpen = checkMarketOpen();
       if (isOpen && !socketRef.current) {
         socketRef.current = new WebSocket(
-          `wss://ws.finnhub.io?token=${process.env.NEXT_PUBLIC_DOW_API_KEY}`
+          `wss://ws.finnhub.io?token=${process.env.NEXT_PUBLIC_GOLD_ETF_API_KEY}`
         );
         socketRef.current.addEventListener("open", function () {
           if (socketRef.current) {
             socketRef.current.send(
               JSON.stringify({
                 type: "subscribe",
-                symbol: process.env.NEXT_PUBLIC_DOW_SYMBOL,
+                symbol: process.env.NEXT_PUBLIC_GOLD_ETF_SYMBOL,
               })
             );
           }
@@ -235,6 +233,9 @@ export default function DowPage() {
           const message = JSON.parse(event.data);
 
           if (message.type === "ping") {
+            if (socketRef.current) {
+              socketRef.current.send(JSON.stringify({ type: "pong" }));
+            }
             return;
           }
 
@@ -244,6 +245,7 @@ export default function DowPage() {
             message.data.length > 0
           ) {
             const now = Date.now();
+            console.log("Received trade data:", message.data);
             if (now - lastUpdateTime < updateMs) {
               return;
             }
@@ -318,7 +320,7 @@ export default function DowPage() {
           socketRef.current.send(
             JSON.stringify({
               type: "unsubscribe",
-              symbol: process.env.NEXT_PUBLIC_DOW_SYMBOL,
+              symbol: process.env.NEXT_PUBLIC_GOLD_ETF_SYMBOL,
             })
           );
           socketRef.current.close();
@@ -343,7 +345,7 @@ export default function DowPage() {
         socketRef.current.send(
           JSON.stringify({
             type: "unsubscribe",
-            symbol: process.env.NEXT_PUBLIC_DOW_SYMBOL,
+            symbol: process.env.NEXT_PUBLIC_GOLD_ETF_SYMBOL,
           })
         );
         socketRef.current.close();
@@ -381,10 +383,10 @@ export default function DowPage() {
             Real-time stock data, performance chart, and key metrics.
           </p>
           <div className="mt-3 mb-6 p-4 bg-zinc-800/50 rounded-md border border-zinc-700 text-zinc-300 text-sm">
-            <strong>About SPDR DIA ETF :</strong>
-            Tracks the Dow Jones Industrial Average (DJIA) — the 30 large-cap,
-            blue-chip companies listed on NYSE and NASDAQ, representing major
-            industrial sectors of the U.S. economy.
+            <strong>About SPDR Gold Shares ETF:</strong>
+            Tracks the price of gold bullion — provides investors with exposure
+            to the day-to-day movement of the price of gold bullion,
+            representing a cost-effective way to access the gold market.
             <button
               onClick={() => setShowMore(!showMore)}
               className="ml-2 text-amber-400 underline text-xs"
@@ -393,10 +395,10 @@ export default function DowPage() {
             </button>
             {showMore && (
               <p className="mt-2 text-xs text-zinc-400">
-                Also known as "Diamonds", this ETF provides exposure to
-                established companies like UnitedHealth, Goldman Sachs,
-                Microsoft, and others. It is popular for tracking the oldest and
-                most-watched stock index.
+                GLD is backed by physical gold held in secure vaults. Each share
+                represents approximately 1/10th of an ounce of gold. It's often
+                used as a hedge against inflation and currency devaluation,
+                providing portfolio diversification during economic uncertainty.
               </p>
             )}
           </div>
