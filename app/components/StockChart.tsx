@@ -1,5 +1,4 @@
 "use client";
-import { useState, useEffect, useRef } from "react";
 import {
   LineChart,
   Line,
@@ -18,9 +17,6 @@ interface StockChartProps {
   chartError: string | null;
   previousClose?: number;
   change?: number;
-  // currentPrice?: number;
-  // fiftyTwoWeekHigh: number | null;
-  // fiftyTwoWeekLow: number | null;
   onTimeframeChange: (timeframe: string) => void;
   onRetry: () => void;
 }
@@ -35,10 +31,16 @@ export default function StockChart({
   onTimeframeChange,
   onRetry,
 }: StockChartProps) {
-    
+  const isChartPositive =
+    chartData.length > 1
+      ? chartData[chartData.length - 1].value >= chartData[0].value
+      : Boolean(change && change >= 0);
+
+  const chartColor = isChartPositive ? "#22c55e" : "#ef4444";
+  const gradientId = isChartPositive ? "greenGradient" : "redGradient";
+
   return (
     <div className="mt-8">
-      {/* Timeframe selector */}
       <div className="flex justify-between items-center mb-4">
         <h3 className="text-lg font-medium text-white">Price Chart</h3>
         <div className="bg-zinc-800 rounded-full p-1 flex flex-wrap gap-1">
@@ -96,17 +98,9 @@ export default function StockChart({
               margin={{ top: 5, right: 20, left: 10, bottom: 5 }}
             >
               <defs>
-                <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
-                  <stop
-                    offset="5%"
-                    stopColor={change && change >= 0 ? "#22c55e" : "#ef4444"}
-                    stopOpacity={0.2}
-                  />
-                  <stop
-                    offset="95%"
-                    stopColor={change && change >= 0 ? "#22c55e" : "#ef4444"}
-                    stopOpacity={0}
-                  />
+                <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor={chartColor} stopOpacity={0.2} />
+                  <stop offset="95%" stopColor={chartColor} stopOpacity={0} />
                 </linearGradient>
               </defs>
 
@@ -157,13 +151,13 @@ export default function StockChart({
                 dataKey="value"
                 stroke="none"
                 fillOpacity={1}
-                fill="url(#colorValue)"
+                fill={`url(#${gradientId})`}
               />
 
               <Line
                 type="monotone"
                 dataKey="value"
-                stroke={change && change >= 0 ? "#22c55e" : "#ef4444"}
+                stroke={chartColor}
                 strokeWidth={1.5}
                 dot={false}
                 activeDot={{ r: 4, stroke: "#18181b", strokeWidth: 1 }}
@@ -203,8 +197,6 @@ export default function StockChart({
           </div>
         )}
       </div>
-
-      
     </div>
   );
 }
