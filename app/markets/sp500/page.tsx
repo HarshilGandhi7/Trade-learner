@@ -15,7 +15,7 @@ type IndexData = {
   low: number;
 };
 
-export default function INVESCO_ETF() {
+export default function SP500_ETF() {
   const [data, setData] = useState<IndexData | null>(null);
   const [chartData, setChartData] = useState<{ time: number; value: number }[]>(
     []
