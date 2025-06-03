@@ -1,5 +1,5 @@
 import toast from "react-hot-toast";
-import {auth} from "../../../firebaseConfig";
+import { auth } from "../../../firebaseConfig";
 import { updatePassword } from "@/utils/auth";
 
 interface UserData {
@@ -8,8 +8,7 @@ interface UserData {
   username: string;
 }
 
-export const ChangePassword = ({userData}: {userData: UserData}) => {
-    
+export const ChangePassword = ({ userData }: { userData: UserData }) => {
   const updateUserPassword = async () => {
     const newPasswordInput = document.getElementById(
       "new-password"
@@ -73,6 +72,7 @@ export const ChangePassword = ({userData}: {userData: UserData}) => {
               <input
                 type="text"
                 id="username"
+                disabled={true}
                 className="mt-1 block w-full bg-zinc-900 border border-zinc-700 rounded-md py-2 px-3 text-white"
                 defaultValue={userData?.username || ""}
               />
@@ -87,6 +87,7 @@ export const ChangePassword = ({userData}: {userData: UserData}) => {
               <input
                 type="email"
                 id="email"
+                disabled={true}
                 className="mt-1 block w-full bg-zinc-900 border border-zinc-700 rounded-md py-2 px-3 text-white"
                 defaultValue={userData?.email || ""}
               />

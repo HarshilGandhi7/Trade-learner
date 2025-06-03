@@ -3,7 +3,7 @@
 import { getPortfolio } from "@/utils/portfolio";
 import { useEffect, useState } from "react";
 
-interface PortfolioData {
+export interface PortfolioData {
   avgPrice: number;
   firstPurchased: string;
   lastUpdated: string;

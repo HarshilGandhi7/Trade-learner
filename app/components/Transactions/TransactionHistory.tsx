@@ -2,7 +2,7 @@
 import { getTransactionHistory } from "@/utils/transactions";
 import React, { useEffect, useState } from "react";
 
-interface TransactionData {
+export interface TransactionData {
   data: string;
   name: string;
   price: number;

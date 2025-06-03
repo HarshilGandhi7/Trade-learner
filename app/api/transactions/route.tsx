@@ -99,6 +99,7 @@ export async function POST(req: Request) {
         if (parseFloat(quantity) <= portfolio[exisitingAssetIndex].quantity) {
           const assetToSell = portfolio[exisitingAssetIndex];
           const newQuantity = assetToSell.quantity - parseFloat(quantity);
+          const amountInvested = user.amountInvested -transactionValue;
           const newBalance = userBalance + transactionValue;
 
           if (newQuantity > 0) {
@@ -112,6 +113,7 @@ export async function POST(req: Request) {
           }
 
           await updateDoc(userRef, {
+            amountInvested: amountInvested,
             credits: newBalance,
             portfolio: newPortfolio,
             transactions: arrayUnion(transaction),
