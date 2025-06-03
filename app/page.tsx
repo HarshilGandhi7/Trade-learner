@@ -209,7 +209,7 @@ export default function Home() {
           <div className="space-y-1">
             <Link
               href="/dashboard"
-              className="group flex items-center px-2 py-2 text-base font-medium rounded-md bg-zinc-700 text-white"
+              className="group flex items-center px-3 py-2.5 text-base font-medium rounded-md transition-all duration-200 hover:bg-amber-600/20 bg-zinc-700/80 text-white"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -217,7 +217,7 @@ export default function Home() {
                 viewBox="0 0 24 24"
                 strokeWidth={1.5}
                 stroke="currentColor"
-                className="w-5 h-5 mr-3 text-amber-500"
+                className="w-5 h-5 mr-3 text-amber-500 group-hover:text-amber-400"
               >
                 <path
                   strokeLinecap="round"
@@ -226,6 +226,26 @@ export default function Home() {
                 />
               </svg>
               Dashboard
+            </Link>
+            <Link
+              href="/AddMoney"
+              className="group flex items-center px-3 py-2.5 text-base font-medium rounded-md transition-all duration-200 hover:bg-amber-600/20 bg-zinc-700/80 text-white"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.5}
+                stroke="currentColor"
+                className="w-5 h-5 mr-3 text-amber-500 group-hover:text-amber-400"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M12 6v12m6-6H6"
+                />
+              </svg>
+              Add Credits
             </Link>
           </div>
         </nav>
@@ -308,7 +328,6 @@ export default function Home() {
           </div>
         </header>
 
-        {/* Hero Section */}
         <section className="py-16 md:py-24">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center md:text-left md:flex md:items-center md:justify-between">
@@ -429,6 +448,120 @@ export default function Home() {
                 </p>
               </div>
             </div>
+          </div>
+        </section>
+
+        <section className="py-16 bg-zinc-900">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl font-bold text-white">
+                <span className="text-amber-500">Credits System</span>
+              </h2>
+              <p className="mt-4 text-lg text-zinc-300 max-w-3xl mx-auto">
+                Trade with virtual credits that simulate real-world trading
+                without any financial risk.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="bg-zinc-800 p-6 rounded-lg border border-zinc-700 transition-all hover:border-amber-600 hover:shadow-md hover:shadow-amber-900/20">
+                <div className="h-16 w-16 rounded-full bg-amber-900/30 flex items-center justify-center mb-4 mx-auto">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke-width="1.5"
+                    stroke="currentColor"
+                    className="w-8 h-8 text-amber-500"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M21 11.25v8.25a1.5 1.5 0 01-1.5 1.5H5.25a1.5 1.5 0 01-1.5-1.5v-8.25M12 4.875A2.625 2.625 0 109.375 7.5H12m0-2.625V7.5m0-2.625A2.625 2.625 0 1114.625 7.5H12m0 0V21m-8.625-9.75h18c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125h-18c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z"
+                    />
+                  </svg>
+                </div>
+                <h3 className="text-xl font-bold text-white text-center">
+                  Free Credits
+                </h3>
+                <div className="text-3xl font-bold text-amber-500 text-center mt-2">
+                  10,000
+                </div>
+                <p className="mt-4 text-center text-zinc-300">
+                  Start with 10,000 free credits when you sign up. Equivalent to
+                  $10,000 in the real world.
+                </p>
+              </div>
+
+              <div className="bg-zinc-800 p-6 rounded-lg border border-zinc-700 transition-all hover:border-amber-600 hover:shadow-md hover:shadow-amber-900/20">
+                <div className="h-16 w-16 rounded-full bg-amber-900/30 flex items-center justify-center mb-4 mx-auto">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke-width="1.5"
+                    stroke="currentColor"
+                    className="w-8 h-8 text-amber-500"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                </div>
+                <h3 className="text-xl font-bold text-white text-center">
+                  Credit Value
+                </h3>
+                <div className="text-3xl font-bold text-amber-500 text-center mt-2">
+                  1:1
+                </div>
+                <p className="mt-4 text-center text-zinc-300">
+                  Each credit is equivalent to $1 in real-world value, making it
+                  easy to understand your simulated performance.
+                </p>
+              </div>
+
+              <div className="bg-zinc-800 p-6 rounded-lg border border-zinc-700 transition-all hover:border-amber-600 hover:shadow-md hover:shadow-amber-900/20">
+                <div className="h-16 w-16 rounded-full bg-amber-900/30 flex items-center justify-center mb-4 mx-auto">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke-width="1.5"
+                    stroke="currentColor"
+                    className="w-8 h-8 text-amber-500"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M12 6v12m6-6H6"
+                    />
+                  </svg>
+                </div>
+                <h3 className="text-xl font-bold text-white text-center">
+                  Additional Credits
+                </h3>
+                <div className="text-3xl font-bold text-amber-500 text-center mt-2">
+                  1,000:$1
+                </div>
+                <p className="mt-4 text-center text-zinc-300">
+                  Need more practice? Get 1,000 additional credits for each $1
+                  spent. Boost your trading portfolio anytime.
+                </p>
+              </div>
+            </div>
+
+            {!userData && (
+              <div className="mt-12 text-center">
+                <Link
+                  href="/sign-up"
+                  className="px-8 py-3 bg-amber-600 text-white rounded-md hover:bg-amber-500 transition-colors font-medium text-lg"
+                >
+                  Start Trading with Free Credits
+                </Link>
+              </div>
+            )}
           </div>
         </section>
 
@@ -646,7 +779,6 @@ export default function Home() {
           </div>
         </section>
 
-        {/* CTA Section */}
         {!userData && (
           <section className="py-16 bg-zinc-800">
             <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
@@ -669,11 +801,9 @@ export default function Home() {
           </section>
         )}
 
-        {/* Footer - New Addition */}
         <footer className="bg-zinc-900 border-t border-zinc-800 mt-auto">
           <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-              {/* Company Info */}
               <div className="col-span-1 md:col-span-1">
                 <h3 className="text-xl font-semibold text-white">
                   Trade<span className="text-amber-500">Learner</span>

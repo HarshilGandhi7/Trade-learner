@@ -17,7 +17,7 @@ export const Overview = ({ userId }: { userId: string }) => {
   );
   const [amountInvested, setAmountInvested] = useState<string>("0.00");
   const [creditsLeft, setCreditsLeft] = useState<string>("0.00");
-  const [portfolioValue, setPortfolioValue] = useState<string>("0.00");
+  const [portfolioValue, setPortfolioValue] = useState<string>("Nan");
   const [totalProfitLoss, setTotalProfitLoss] = useState<number>(0);
   const [profitLossPercent, setProfitLossPercent] = useState<number>(0);
 

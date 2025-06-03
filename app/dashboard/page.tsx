@@ -66,7 +66,6 @@ const DashboardPage = () => {
           </p>
         </div>
 
-        {/* Dashboard navigation tabs */}
         <div className="mt-6 border-b border-zinc-700">
           <div className="flex space-x-8">
             {["overview", "portfolio", "transactions", "settings"].map(
@@ -87,7 +86,6 @@ const DashboardPage = () => {
           </div>
         </div>
 
-        {/* Main content area */}
         <div className="mt-8">
           {activeTab === "overview" && userData &&  (
           <Overview userId={userData?.uid.toString()}/>
