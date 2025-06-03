@@ -6,6 +6,19 @@ import {
 } from "firebase/auth";
 import { collection, doc, getDocs, setDoc } from "firebase/firestore";
 import Cookies from "js-cookie";
+import {
+  getAuth,
+  EmailAuthProvider,
+  updatePassword as firebaseUpdatePassword,
+  reauthenticateWithCredential,
+} from "firebase/auth";
+
+type UserData = {
+  uid: string;
+  email: string;
+  username: string;
+};
+
 
 export const RegisterUser = async (
   username: string,
@@ -48,6 +61,7 @@ export const RegisterUser = async (
       uid: user.uid,
       username: username,
       email: email,
+      credits: 10000,
       createdAt: new Date().toISOString(),
     });
     return new Response(
@@ -91,7 +105,9 @@ export const loginUser = async (email: string, password: string) => {
   );
   const user = authCredential.user;
   if (user) {
-    setCookie({ userData: { uid: user.uid, email } });
+    setCookie({
+      userData: { username: user.displayName || "", uid: user.uid, email },
+    });
     return new Response(
       JSON.stringify({ success: true, user: { uid: user.uid, email } }),
       {
@@ -110,11 +126,88 @@ export const loginUser = async (email: string, password: string) => {
   }
 };
 
-type UserData = {
-  uid: string;
-  email: string;
-};
-
 export const setCookie = async ({ userData }: { userData: UserData }) => {
   Cookies.set("user", JSON.stringify(userData), { expires: 7 });
+};
+
+export const getCookie = () => {
+  const userCookie = Cookies.get("user");
+  if (userCookie) {
+    return JSON.parse(userCookie) as UserData;
+  }
+  return null;
+};
+
+export const updatePassword = async (
+  newPassword: string,
+  currentPassword: string
+) => {
+  try {
+    const user = auth.currentUser;
+    if (!user?.email) {
+      throw new Error("User email not found");
+    }
+
+    const credential = EmailAuthProvider.credential(
+      user.email,
+      currentPassword
+    );
+
+    await reauthenticateWithCredential(user, credential);
+    await firebaseUpdatePassword(user, newPassword);
+
+    return new Response(JSON.stringify({ success: true }), {
+      status: 500,
+      headers: { "Content-Type": "application/json" },
+    });
+  } catch (error: any) {
+    console.error("Error updating password:", error);
+
+    if(error.code==='auth/invalid-credential'){
+      return new Response(
+        JSON.stringify({
+          success: false,
+          message: "Invalid credentials provided",
+        }),
+        {
+          status: 400,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+    }
+    else if (error.code === "auth/wrong-password") {
+      return new Response(
+        JSON.stringify({
+          success: false,
+          message: "Incorrect current password",
+        }),
+        {
+          status: 500,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+    } else if (error.code === "auth/requires-recent-login") {
+      return new Response(
+        JSON.stringify({
+          success: false,
+          message: "Please login again before changing your password",
+        }),
+        {
+          status: 500,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+    } else {
+      return new Response(
+        JSON.stringify({
+          success: false,
+          message: "Unable to change your password",
+        }),
+        {
+          status: 500,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+    }
+  }
 };

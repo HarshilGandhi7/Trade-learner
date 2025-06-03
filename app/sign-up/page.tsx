@@ -1,8 +1,9 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import toast from "react-hot-toast";
-import { RegisterUser } from "@/utils/auth";
+import { getCookie, RegisterUser } from "@/utils/auth";
+import { useRouter } from "next/navigation";
 
 const SignUpPage = () => {
   const [username, setUsername] = useState("");
@@ -10,6 +11,17 @@ const SignUpPage = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
+  const router= useRouter();
+
+  useEffect(()=>{
+      const checkLogin = async () => {
+        const userCookie = getCookie();
+        if (userCookie) {
+          router.push("/");
+        } 
+      }
+      checkLogin();
+  },[])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

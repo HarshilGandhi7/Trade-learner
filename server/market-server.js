@@ -509,7 +509,6 @@ async function connectToBinanceCrypto() {
     const ws = new WebSocket(process.env.BINANCE_WS_URL);
 
     ws.on("open", () => {
-
       const subscribeMessage = {
         method: "SUBSCRIBE",
         params: Object.keys(CRYPTOS).map(
@@ -529,11 +528,6 @@ async function connectToBinanceCrypto() {
         const lastUpdates = new Map();
         const UPDATE_THROTTLE = 5000;
 
-        if (message.ping) {
-          ws.send(JSON.stringify({ pong: message.ping }));
-          return;
-        }
-
         if (message.e === "24hrTicker") {
           const lastUpdate = lastUpdates.get(symbol) || 0;
           if (now - lastUpdate >= UPDATE_THROTTLE) {
@@ -551,9 +545,7 @@ async function connectToBinanceCrypto() {
             });
 
             lastUpdates.set(symbol, now);
-
           }
-
         }
       } catch (error) {
         console.error("Error processing message:", error);
@@ -566,7 +558,6 @@ async function connectToBinanceCrypto() {
 
     ws.on("close", () => {
       console.log("WebSocket connection closed, reconnecting...");
-      clearInterval(pingInterval);
       setTimeout(connectToBinanceCrypto, 5000);
     });
 
@@ -655,4 +646,37 @@ async function startServer() {
   });
 }
 
+app.get("/api/current/data/all", async (req, res) => {
+  try {
+    const currentPrice = {};
+
+    for (const symbol of Object.keys(MARKETS)) {
+      const marketKey = `market:${symbol}:current`;
+      const marketData = await redisClient.hGetAll(marketKey);
+      if (marketData && marketData.currentPrice) {
+        currentPrice[symbol.slice(0,3)] = parseFloat(marketData.currentPrice);
+      }
+    }
+
+    for (const symbol of Object.keys(CRYPTOS)) {
+      const cryptoKey = `crypto:${symbol}:current`;
+      const cryptoData = await redisClient.hGetAll(cryptoKey);
+      if (cryptoData && cryptoData.currentPrice) {
+        currentPrice[symbol.slice(0,3)] = parseFloat(cryptoData.currentPrice) || 0;
+      }
+    }
+
+
+    return res.status(200).json({
+      success: true,
+      data: currentPrice,
+    });
+  } catch (error) {
+    console.error("Error fetching current prices:", error);
+    return res.status(500).json({
+      success: false,
+      error: "Failed to fetch current prices",
+    });
+  }
+});
 startServer();

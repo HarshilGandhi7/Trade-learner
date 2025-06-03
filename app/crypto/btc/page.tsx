@@ -1,7 +1,11 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
-import CryptoChart from "@/app/components/CryptoChart";
-import CryptoData from "@/app/components/CryptoData";
+import CryptoChart from "@/app/components/Crypto/CryptoChart";
+import CryptoData from "@/app/components/Crypto/CryptoData";
+import TransactionModal from "@/app/components/Transactions/TransactionModal";
+import toast from "react-hot-toast";
+import { getCookie } from "@/utils/auth";
+import { executeTransaction } from "@/utils/transactions";
 
 type CryptoData = {
   symbol: string;
@@ -15,7 +19,7 @@ type CryptoData = {
   lastUpdate: number;
 };
 
-export interface CryptoDataProps{
+export interface CryptoDataProps {
   symbol: string;
   name: string;
   onDataUpdate: (newData: CryptoData) => void;
@@ -33,6 +37,11 @@ export default function BITCOINT_PAGE() {
   const Name = "Bitcoin (BTC-USD)";
   const [showMore, setShowMore] = useState(false);
   const lastUpdateRef = useRef<number>(0);
+
+  const [buyModalOpen, setBuyModalOpen] = useState(false);
+  const [sellModalOpen, setSellModalOpen] = useState(false);
+  const [quantity, setQuantity] = useState("0.01");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const fetchHistoricalData = async (selectedTimeframe = timeframe) => {
     try {
@@ -68,7 +77,7 @@ export default function BITCOINT_PAGE() {
       const data = await response.json();
 
       const formattedData = data.prices.map((item: [number, number]) => ({
-        time: item[0], 
+        time: item[0],
         value: item[1],
       }));
 
@@ -80,15 +89,21 @@ export default function BITCOINT_PAGE() {
         const change24h = latestPrice - yesterdayPrice;
         const percentChange24h = (change24h / yesterdayPrice) * 100;
 
-        setData((prevData:CryptoData | null) => ({
-          symbol:"BTCUSDT",
+        setData((prevData: CryptoData | null) => ({
+          symbol: "BTCUSDT",
           currentPrice: latestPrice,
           change24h: change24h,
           percentChange24h: percentChange24h,
           high24h: Math.max(...data.prices.map((p: [number, number]) => p[1])),
           low24h: Math.min(...data.prices.map((p: [number, number]) => p[1])),
-          volume24h: data.total_volumes.reduce((acc: number, curr: [number, number]) => acc + curr[1], 0),
-          marketCap: data.market_caps.reduce((acc: number, curr: [number, number]) => acc + curr[1], 0),
+          volume24h: data.total_volumes.reduce(
+            (acc: number, curr: [number, number]) => acc + curr[1],
+            0
+          ),
+          marketCap: data.market_caps.reduce(
+            (acc: number, curr: [number, number]) => acc + curr[1],
+            0
+          ),
           lastUpdate: Date.now(),
         }));
 
@@ -107,6 +122,21 @@ export default function BITCOINT_PAGE() {
   useEffect(() => {
     fetchHistoricalData(timeframe);
   }, [timeframe]);
+
+  async function handleTransaction(
+    currentPrice: number,
+    type: string,
+    quantity: string
+  ) {
+    await executeTransaction({
+      symbol: "BTC",
+      name: "Bitcoin",
+      currentPrice,
+      type: type as "buy" | "sell",
+      quantity,
+      setIsSubmitting,
+    });
+  }
 
   return (
     <div className="bg-zinc-900 min-h-screen">
@@ -157,11 +187,56 @@ export default function BITCOINT_PAGE() {
             onTimeframeChange={setTimeframe}
             onRetry={() => fetchHistoricalData(timeframe)}
           />
+          <div className="flex space-x-4 mt-6 mb-6">
+            <button
+              onClick={() => setBuyModalOpen(true)}
+              className="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-md transition-colors flex items-center justify-center"
+              disabled={!data?.currentPrice}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.5}
+                stroke="currentColor"
+                className="w-5 h-5 mr-2"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M12 6v12m6-6H6"
+                />
+              </svg>
+              Buy
+            </button>
 
-          <CryptoData 
+            <button
+              onClick={() => setSellModalOpen(true)}
+              className="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-md transition-colors flex items-center justify-center"
+              disabled={!data?.currentPrice}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.5}
+                stroke="currentColor"
+                className="w-5 h-5 mr-2"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M18 12H6"
+                />
+              </svg>
+              Sell
+            </button>
+          </div>
+
+          <CryptoData
             symbol={process.env.NEXT_PUBLIC_BITCOIN_SYMBOL || "BTCUSDT"}
             name={Name}
-            onDataUpdate={(newData:CryptoData) => {
+            onDataUpdate={(newData: CryptoData) => {
               setData(newData);
               if (timeframe === "1D") {
                 const now = Date.now();
@@ -180,6 +255,36 @@ export default function BITCOINT_PAGE() {
           />
         </div>
       </div>
+
+      <TransactionModal
+        isOpen={buyModalOpen}
+        onClose={() => setBuyModalOpen(false)}
+        type="buy"
+        assetName="Bitcoin"
+        assetSymbol="BTC"
+        currentPrice={data?.currentPrice}
+        quantity={quantity}
+        onQuantityChange={setQuantity}
+        onConfirm={() =>
+          handleTransaction(data?.currentPrice || 0, "buy", quantity)
+        }
+        isSubmitting={isSubmitting}
+      />
+
+      <TransactionModal
+        isOpen={sellModalOpen}
+        onClose={() => setSellModalOpen(false)}
+        type="sell"
+        assetName="Bitcoin"
+        assetSymbol="BTC"
+        currentPrice={data?.currentPrice}
+        quantity={quantity}
+        onQuantityChange={setQuantity}
+        onConfirm={() =>
+          handleTransaction(data?.currentPrice || 0, "sell", quantity)
+        }
+        isSubmitting={isSubmitting}
+      />
     </div>
   );
 }

@@ -1,9 +1,9 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
-import { loginUser } from "@/utils/auth";
+import { getCookie, loginUser } from "@/utils/auth";
 
 const SignInPage = () => {
   const [email, setEmail] = useState("");
@@ -11,16 +11,26 @@ const SignInPage = () => {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
+  useEffect(() => {
+    const checkLogin = async () => {
+      const userCookie = getCookie();
+      if (userCookie) {
+        router.push("/");
+      }
+    };
+    checkLogin();
+  }, []);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     setLoading(true);
-    
+
     try {
-      if(!email || !password){
+      if (!email || !password) {
         toast.error("Please fill in all fields");
         setLoading(false);
-        return ;
+        return;
       }
 
       const loginUserData = await loginUser(email, password);
@@ -33,7 +43,6 @@ const SignInPage = () => {
         return;
       }
     } catch (error: any) {
-      
     } finally {
       setLoading(false);
     }
@@ -50,10 +59,13 @@ const SignInPage = () => {
             Access your trading dashboard
           </p>
         </div>
-        
+
         <form className="mt-8 space-y-4" onSubmit={handleSubmit}>
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-zinc-300">
+            <label
+              htmlFor="email"
+              className="block text-sm font-medium text-zinc-300"
+            >
               Email address
             </label>
             <input
@@ -70,9 +82,12 @@ const SignInPage = () => {
               placeholder="Email address"
             />
           </div>
-          
+
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-zinc-300">
+            <label
+              htmlFor="password"
+              className="block text-sm font-medium text-zinc-300"
+            >
               Password
             </label>
             <input
@@ -89,8 +104,7 @@ const SignInPage = () => {
               placeholder="Password"
             />
           </div>
-          
-          
+
           <div className="mt-6">
             <button
               type="submit"
@@ -108,7 +122,10 @@ const SignInPage = () => {
         <div className="text-center mt-4">
           <p className="text-sm text-zinc-400">
             Don&apos;t have an account?{" "}
-            <Link href="/sign-up" className="font-medium text-amber-400 hover:text-amber-300">
+            <Link
+              href="/sign-up"
+              className="font-medium text-amber-400 hover:text-amber-300"
+            >
               Create an account
             </Link>
           </p>

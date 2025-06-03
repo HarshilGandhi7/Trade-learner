@@ -1,7 +1,9 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
-import CryptoChart from "@/app/components/CryptoChart";
-import CryptoData from "@/app/components/CryptoData";
+import CryptoChart from "@/app/components/Crypto/CryptoChart";
+import CryptoData from "@/app/components/Crypto/CryptoData";
+import { executeTransaction } from "@/utils/transactions";
+import TransactionModal from "@/app/components/Transactions/TransactionModal";
 
 type CryptoData = {
   symbol: string;
@@ -33,6 +35,11 @@ export default function ETHERIUM_PAGE() {
   const Name = "Ethereum (ETH-USD)";
   const [showMore, setShowMore] = useState(false);
   const lastUpdateRef = useRef<number>(0);
+
+  const [buyModalOpen, setBuyModalOpen] = useState(false);
+  const [sellModalOpen, setSellModalOpen] = useState(false);
+  const [quantity, setQuantity] = useState("0.01");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const fetchHistoricalData = async (selectedTimeframe = timeframe) => {
     try {
@@ -114,6 +121,21 @@ export default function ETHERIUM_PAGE() {
     fetchHistoricalData(timeframe);
   }, [timeframe]);
 
+  async function handleTransaction(
+    currentPrice: number,
+    type: string,
+    quantity: string
+  ) {
+    await executeTransaction({
+      symbol: "ETH",
+      name: "Ethereum",
+      currentPrice,
+      type: type as "buy" | "sell",
+      quantity,
+      setIsSubmitting,
+    });
+  }
+
   return (
     <div className="bg-zinc-900 min-h-screen">
       <div className="max-w-7xl mx-auto py-4 px-4">
@@ -165,6 +187,52 @@ export default function ETHERIUM_PAGE() {
             onTimeframeChange={setTimeframe}
             onRetry={() => fetchHistoricalData(timeframe)}
           />
+          
+          <div className="flex space-x-4 mt-6 mb-6">
+            <button
+              onClick={() => setBuyModalOpen(true)}
+              className="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-md transition-colors flex items-center justify-center"
+              disabled={!data?.currentPrice}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.5}
+                stroke="currentColor"
+                className="w-5 h-5 mr-2"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M12 6v12m6-6H6"
+                />
+              </svg>
+              Buy
+            </button>
+
+            <button
+              onClick={() => setSellModalOpen(true)}
+              className="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-md transition-colors flex items-center justify-center"
+              disabled={!data?.currentPrice}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.5}
+                stroke="currentColor"
+                className="w-5 h-5 mr-2"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M18 12H6"
+                />
+              </svg>
+              Sell
+            </button>
+          </div>
 
           <CryptoData
             symbol={process.env.NEXT_PUBLIC_ETHERIUM_SYMBOL || "ETHUSDT"}
@@ -188,6 +256,35 @@ export default function ETHERIUM_PAGE() {
           />
         </div>
       </div>
+      <TransactionModal
+        isOpen={buyModalOpen}
+        onClose={() => setBuyModalOpen(false)}
+        type="buy"
+        assetName="Ethereum"
+        assetSymbol="ETH"
+        currentPrice={data?.currentPrice}
+        quantity={quantity}
+        onQuantityChange={setQuantity}
+        onConfirm={() =>
+          handleTransaction(data?.currentPrice || 0, "buy", quantity)
+        }
+        isSubmitting={isSubmitting}
+      />
+
+      <TransactionModal
+        isOpen={sellModalOpen}
+        onClose={() => setSellModalOpen(false)}
+        type="sell"
+        assetName="Ethereum"
+        assetSymbol="ETH"
+        currentPrice={data?.currentPrice}
+        quantity={quantity}
+        onQuantityChange={setQuantity}
+        onConfirm={() =>
+          handleTransaction(data?.currentPrice || 0, "sell", quantity)
+        }
+        isSubmitting={isSubmitting}
+      />
     </div>
   );
 }
