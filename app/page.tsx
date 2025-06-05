@@ -36,6 +36,17 @@ export default function Home() {
     checkLogin();
   }, []);
 
+  const STOCK_MARKETS = [
+    { symbol: "QQQ", name: "Invesco QQQ Trust", description: "Nasdaq 100 ETF" },
+    { symbol: "MSFT", name: "Microsoft", description: "Microsoft" },
+    { symbol: "AAPL", name: "Apple", description: "Apple" },
+  ];
+  const CRYPTO_MARKETS = [
+    { symbol: "BTC", name: "Bitcoin", color: "text-amber-400" },
+    { symbol: "ETH", name: "Ethereum", color: "text-blue-400" },
+    { symbol: "SOL", name: "Solana", color: "text-purple-400" },
+  ];
+
   return loading ? (
     <div role="status">
       <svg
@@ -93,114 +104,52 @@ export default function Home() {
             Markets
           </h3>
           <div className="space-y-1">
-            <Link
-              href="/markets/invesco"
-              className="group flex items-center px-2 py-2 text-base font-medium rounded-md text-zinc-300 hover:bg-zinc-700 hover:text-white"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={1.5}
-                stroke="currentColor"
-                className="w-5 h-5 mr-3 text-zinc-400 group-hover:text-zinc-300"
+            {STOCK_MARKETS.map((market) => (
+              <Link
+                key={market.symbol}
+                href={`/markets/${market.symbol}`}
+                className="group flex items-center px-2 py-2 text-base font-medium rounded-md text-zinc-300 hover:bg-zinc-700 hover:text-white"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M2.25 18L9 11.25l4.306 4.307a11.95 11.95 0 015.814-5.519l2.74-1.22m0 0l-5.94-2.28m5.94 2.28l-2.28 5.941"
-                />
-              </svg>
-              Nasdaq 100 ETF
-            </Link>
-            <Link
-              href="/markets/gold-etf"
-              className="group flex items-center px-2 py-2 text-base font-medium rounded-md text-zinc-300 hover:bg-zinc-700 hover:text-white"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={1.5}
-                stroke="currentColor"
-                className="w-5 h-5 mr-3 text-zinc-400 group-hover:text-zinc-300"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M2.25 18L9 11.25l4.306 4.307a11.95 11.95 0 015.814-5.519l2.74-1.22m0 0l-5.94-2.28m5.94 2.28l-2.28 5.941"
-                />
-              </svg>
-              GOLD-ETF
-            </Link>
-            <Link
-              href="/markets/sp500"
-              className="group flex items-center px-2 py-2 text-base font-medium rounded-md text-zinc-300 hover:bg-zinc-700 hover:text-white"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={1.5}
-                stroke="currentColor"
-                className="w-5 h-5 mr-3 text-zinc-400 group-hover:text-zinc-300"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M2.25 18L9 11.25l4.306 4.307a11.95 11.95 0 015.814-5.519l2.74-1.22m0 0l-5.94-2.28m5.94 2.28l-2.28 5.941"
-                />
-              </svg>
-              S&P 500
-            </Link>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={1.5}
+                  stroke="currentColor"
+                  className="w-5 h-5 mr-3 text-zinc-400 group-hover:text-zinc-300"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M2.25 18L9 11.25l4.306 4.307a11.95 11.95 0 015.814-5.519l2.74-1.22m0 0l-5.94-2.28m5.94 2.28l-2.28 5.941"
+                  />
+                </svg>
+                {market.description}
+              </Link>
+            ))}
           </div>
 
           <h3 className="text-xs uppercase tracking-wider text-zinc-500 font-semibold mb-3 px-2 mt-6">
             Cryptocurrencies
           </h3>
           <div className="space-y-1">
-            <Link
-              href="/crypto/btc"
-              className="group flex items-center px-2 py-2 text-base font-medium rounded-md text-zinc-300 hover:bg-zinc-700 hover:text-white"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="currentColor"
-                className="w-5 h-5 mr-3 text-amber-400 group-hover:text-amber-300"
+            {CRYPTO_MARKETS.map((crypto) => (
+              <Link
+                key={crypto.symbol}
+                href={`/crypto/${crypto.symbol}`}
+                className="group flex items-center px-2 py-2 text-base font-medium rounded-md text-zinc-300 hover:bg-zinc-700 hover:text-white"
               >
-                <path d="M10.5 21l-.426-.426a.749.749 0 00-.765-.172l-4.562 1.72a.749.749 0 01-.935-.935l1.72-4.561a.749.749 0 00-.172-.764L5 15.5l-.36-.36a.2.2 0 01-.038-.238l3.26-6.929a.2.2 0 01.336-.067L12 12l3.803-4.064a.2.2 0 01.336.067l3.26 6.929a.2.2 0 01-.038.238l-.36.36.36.36c.203.203.271.5.172.764l-1.72 4.561a.749.749 0 01-.935.935l-4.562-1.72a.749.749 0 00-.765.172L10.5 21z" />
-              </svg>
-              Bitcoin (BTC)
-            </Link>
-            <Link
-              href="/crypto/eth"
-              className="group flex items-center px-2 py-2 text-base font-medium rounded-md text-zinc-300 hover:bg-zinc-700 hover:text-white"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="currentColor"
-                className="w-5 h-5 mr-3 text-blue-400 group-hover:text-blue-300"
-              >
-                <path d="M10.5 21l-.426-.426a.749.749 0 00-.765-.172l-4.562 1.72a.749.749 0 01-.935-.935l1.72-4.561a.749.749 0 00-.172-.764L5 15.5l-.36-.36a.2.2 0 01-.038-.238l3.26-6.929a.2.2 0 01.336-.067L12 12l3.803-4.064a.2.2 0 01.336.067l3.26 6.929a.2.2 0 01-.038.238l-.36.36.36.36c.203.203.271.5.172.764l-1.72 4.561a.749.749 0 01-.935.935l-4.562-1.72a.749.749 0 00-.765.172L10.5 21z" />
-              </svg>
-              Ethereum (ETH)
-            </Link>
-            <Link
-              href="/crypto/sol"
-              className="group flex items-center px-2 py-2 text-base font-medium rounded-md text-zinc-300 hover:bg-zinc-700 hover:text-white"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="currentColor"
-                className="w-5 h-5 mr-3 text-purple-400 group-hover:text-purple-300"
-              >
-                <path d="M10.5 21l-.426-.426a.749.749 0 00-.765-.172l-4.562 1.72a.749.749 0 01-.935-.935l1.72-4.561a.749.749 0 00-.172-.764L5 15.5l-.36-.36a.2.2 0 01-.038-.238l3.26-6.929a.2.2 0 01.336-.067L12 12l3.803-4.064a.2.2 0 01.336.067l3.26 6.929a.2.2 0 01-.038.238l-.36.36.36.36c.203.203.271.5.172.764l-1.72 4.561a.749.749 0 01-.935.935l-4.562-1.72a.749.749 0 00-.765.172L10.5 21z" />
-              </svg>
-              Solana (SOL)
-            </Link>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  className={`w-5 h-5 mr-3 ${crypto.color} group-hover:opacity-80`}
+                >
+                  <path d="M10.5 21l-.426-.426a.749.749 0 00-.765-.172l-4.562 1.72a.749.749 0 01-.935-.935l1.72-4.561a.749.749 0 00-.172-.764L5 15.5l-.36-.36a.2.2 0 01-.038-.238l3.26-6.929a.2.2 0 01.336-.067L12 12l3.803-4.064a.2.2 0 01.336.067l3.26 6.929a.2.2 0 01-.038.238l-.36.36.36.36c.203.203.271.5.172.764l-1.72 4.561a.749.749 0 01-.935.935l-4.562-1.72a.749.749 0 00-.765.172L10.5 21z" />
+                </svg>
+                {crypto.name} ({crypto.symbol})
+              </Link>
+            ))}
           </div>
 
           <h3 className="text-xs uppercase tracking-wider text-zinc-500 font-semibold mb-3 px-2 mt-6">

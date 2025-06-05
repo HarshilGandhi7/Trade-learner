@@ -25,8 +25,8 @@ app.get("/", (req, res) => {
 
 const MARKETS = {
   QQQ: { apiKey: process.env.FINNHUB_QQQ_API_KEY },
-  SPY: { apiKey: process.env.FINNHUB_SPY_API_KEY },
-  GLD: { apiKey: process.env.FINNHUB_GLD_API_KEY },
+  AAPL: { apiKey: process.env.FINNHUB_AAPL_API_KEY },
+  MSFT: { apiKey: process.env.FINNHUB_MSFT_API_KEY },
 };
 
 const CRYPTOS = {
@@ -222,6 +222,12 @@ function connectToFinnhubMarket(symbol, apiKey) {
           const trades = message.data;
           const lastTrade = trades[trades.length - 1];
 
+          console.log(`Received trade data for ${symbol}:`, lastTrade);
+          await redisClient.set(
+            `trades:${symbol}:latest`,
+            JSON.stringify(message)
+          );
+
           const marketKey = `market:${symbol}:current`;
           let previousData = await redisClient.hGetAll(marketKey);
           let previousClose = previousData.previousClose
@@ -403,6 +409,18 @@ async function updateRedisData() {
             continue;
           }
 
+          const marketKey = `market:${symbol}:current`;
+          let marketData = await redisClient.hGetAll(marketKey);
+
+          const currentTimestamp = Date.now();
+          const lastUpdateTimestamp = marketData.lastUpdate
+            ? new Date(marketData.lastUpdate).getTime()
+            : 0;
+
+          if (currentTimestamp - lastUpdateTimestamp < 30000) {
+            continue;
+          }
+
           const latestTradeJson = await redisClient.get(
             `trades:${symbol}:latest`
           );
@@ -417,8 +435,10 @@ async function updateRedisData() {
           const trades = message.data;
           const lastTrade = trades[trades.length - 1];
 
-          const marketKey = `market:${symbol}:current`;
-          let marketData = await redisClient.hGetAll(marketKey);
+          const tradeTimestamp = lastTrade.t;
+          if (currentTimestamp - tradeTimestamp > 120000) {
+            continue;
+          }
 
           const previousClose = marketData.previousClose
             ? parseFloat(marketData.previousClose)
@@ -654,7 +674,7 @@ app.get("/api/current/data/all", async (req, res) => {
       const marketKey = `market:${symbol}:current`;
       const marketData = await redisClient.hGetAll(marketKey);
       if (marketData && marketData.currentPrice) {
-        currentPrice[symbol.slice(0,3)] = parseFloat(marketData.currentPrice);
+        currentPrice[symbol.slice(0, 3)] = parseFloat(marketData.currentPrice);
       }
     }
 
@@ -662,10 +682,10 @@ app.get("/api/current/data/all", async (req, res) => {
       const cryptoKey = `crypto:${symbol}:current`;
       const cryptoData = await redisClient.hGetAll(cryptoKey);
       if (cryptoData && cryptoData.currentPrice) {
-        currentPrice[symbol.slice(0,3)] = parseFloat(cryptoData.currentPrice) || 0;
+        currentPrice[symbol.slice(0, 3)] =
+          parseFloat(cryptoData.currentPrice) || 0;
       }
     }
-
 
     return res.status(200).json({
       success: true,

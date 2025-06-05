@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
+import { useParams } from "next/navigation";
 import StockChart from "@/app/components/Stock/StockChart";
 import StockData from "@/app/components/Stock/StockData";
 import TransactionModal from "@/app/components/Transactions/TransactionModal";
@@ -13,9 +14,46 @@ type IndexData = {
   previousClose: number;
   high: number;
   low: number;
+  marketStatus: {
+    isOpen: boolean;
+    statusMessage: string;
+  };
+  lastUpdate: string;
 };
 
-export default function SP500_ETF() {
+const STOCK_INFO = {
+  QQQ: {
+    key: "QQQ",
+    name: "Invesco QQQ Trust (QQQ)",
+    description:
+      "Tracks the Nasdaq-100 Index, which includes 100 of the largest non-financial companies listed on the Nasdaq exchange, weighted by market capitalization.",
+    longDescription:
+      "QQQ is heavily weighted towards technology stocks, making it a popular choice for investors seeking exposure to the tech sector. Top holdings include companies like Apple, Microsoft, Amazon, and Nvidia. It's known for its high growth potential and volatility.",
+    ApiKey: process.env.NEXT_PUBLIC_INVESCO_API_KEY,
+  },
+  MSFT: {
+    key: "MSFT",
+    name: "Microsoft Corporation (MSFT)",
+    description:
+      "Microsoft is a global technology company that develops, licenses, and supports software, services, devices, and solutions worldwide.",
+    longDescription:
+      "Founded in 1975, Microsoft is one of the world's largest companies by market capitalization. The company's products include Windows operating system, Office productivity suite, Azure cloud services, and Surface devices. Microsoft also owns LinkedIn, GitHub, and Xbox gaming platform, making it a diversified technology leader across consumer and enterprise markets.",
+    ApiKey: process.env.NEXT_PUBLIC_MSFT_API_KEY,
+  },
+  AAPL: {
+    key: "AAPL",
+    name: "Apple Inc. (AAPL)",
+    description:
+      "Apple is a global technology company that designs, manufactures, and markets smartphones, personal computers, tablets, wearables, and accessories, along with a variety of related services.",
+    longDescription:
+      "Founded in 1976, Apple has become one of the world's largest companies by market capitalization. The company's flagship products include the iPhone, Mac, iPad, and Apple Watch, while its services segment includes the App Store, Apple Music, Apple TV+, and Apple Pay.",
+    ApiKey: process.env.NEXT_PUBLIC_AAPL_API_KEY,
+  },
+};
+
+export default function MarketPage() {
+  const params = useParams();
+  const symbol = params.symbol as keyof typeof STOCK_INFO;
   const [data, setData] = useState<IndexData | null>(null);
   const [chartData, setChartData] = useState<{ time: number; value: number }[]>(
     []
@@ -26,7 +64,7 @@ export default function SP500_ETF() {
   const lastSignificantPriceRef = useRef<number | null>(null);
   const [fiftyTwoWeekHigh, setFiftyTwoWeekHigh] = useState<number | null>(null);
   const [fiftyTwoWeekLow, setFiftyTwoWeekLow] = useState<number | null>(null);
-  const Name = "SPDR S&P 500 ETF Trust (SPY)";
+  const Name = STOCK_INFO[symbol]?.name;
   const [marketStatus, setMarketStatus] = useState<{
     isOpen: boolean;
     statusMessage: string;
@@ -77,14 +115,14 @@ export default function SP500_ETF() {
       }
 
       const response = await fetch(
-        `/api/stock?interval=${interval}&range=${range}&symbol=${process.env.NEXT_PUBLIC_SP500_SYMBOL}`
+        `/api/stock?interval=${interval}&range=${range}&symbol=${symbol}`
       );
-
       if (!response.ok) {
         throw new Error(`Yahoo API error! Status: ${response.status}`);
       }
 
       const data = await response.json();
+      console.log(data);
 
       const result = data?.chart?.result?.[0];
 
@@ -143,15 +181,14 @@ export default function SP500_ETF() {
       }
     }
     await executeTransaction({
-      symbol: "SPY",
-      name: "SPDR S&P 500 ETF Trust",
+      symbol: symbol,
+      name: STOCK_INFO[symbol]?.name,
       currentPrice,
       type: type as "buy" | "sell",
       quantity,
       setIsSubmitting,
     });
   }
-
   return (
     <div className="bg-zinc-900 min-h-screen">
       <div className="max-w-7xl mx-auto py-4 px-4">
@@ -159,16 +196,16 @@ export default function SP500_ETF() {
           <span className="text-sm text-zinc-400">Market Status:</span>
           <div
             className={`inline-flex items-center px-3 py-1 rounded-md text-sm font-medium
-      ${
-        marketStatus.isOpen
-          ? "bg-green-900/30 text-green-500 border border-green-800"
-          : "bg-red-900/30 text-red-500 border border-red-800"
-      }
-    `}
+        ${
+          marketStatus.isOpen
+            ? "bg-green-900/30 text-green-500 border border-green-800"
+            : "bg-red-900/30 text-red-500 border border-red-800"
+        }
+      `}
           >
             <div
               className={`w-2 h-2 rounded-full mr-2 
-        ${marketStatus.isOpen ? "bg-green-500" : "bg-red-500"}`}
+          ${marketStatus.isOpen ? "bg-green-500" : "bg-red-500"}`}
             ></div>
             {marketStatus.statusMessage}
           </div>
@@ -182,10 +219,8 @@ export default function SP500_ETF() {
             Real-time stock data, performance chart, and key metrics.
           </p>
           <div className="mt-3 mb-6 p-4 bg-zinc-800/50 rounded-md border border-zinc-700 text-zinc-300 text-sm">
-            <strong>About SPDR S&P 500 ETF:</strong>
-            Tracks the S&P 500 Index — a diverse portfolio of 500 large-cap U.S.
-            companies across all major sectors, representing about 80% of the
-            available U.S. market capitalization.
+            <strong>{STOCK_INFO[symbol]?.name}</strong>
+            {STOCK_INFO[symbol]?.description}
             <button
               onClick={() => setShowMore(!showMore)}
               className="ml-2 text-amber-400 underline text-xs"
@@ -194,10 +229,7 @@ export default function SP500_ETF() {
             </button>
             {showMore && (
               <p className="mt-2 text-xs text-zinc-400">
-                Known as "Spiders", SPY is the world's largest and most actively
-                traded ETF. It provides broad exposure to the U.S. stock market
-                and is often used as a benchmark for the overall market
-                performance.
+                {STOCK_INFO[symbol]?.longDescription}
               </p>
             )}
           </div>
@@ -303,7 +335,7 @@ export default function SP500_ETF() {
           )}
 
           <StockData
-            symbol={process.env.NEXT_PUBLIC_SP500_SYMBOL || "SPY"}
+            symbol={symbol}
             name={Name}
             onDataUpdate={(newData) => {
               setData(newData);
@@ -329,8 +361,8 @@ export default function SP500_ETF() {
         isOpen={buyModalOpen}
         onClose={() => setBuyModalOpen(false)}
         type="buy"
-        assetName="SPDR S&P 500 ETF Trust"
-        assetSymbol="SPY"
+        assetName={STOCK_INFO[symbol]?.name}
+        assetSymbol={symbol}
         currentPrice={data?.currentPrice}
         quantity={quantity}
         onQuantityChange={setQuantity}
@@ -344,8 +376,8 @@ export default function SP500_ETF() {
         isOpen={sellModalOpen}
         onClose={() => setSellModalOpen(false)}
         type="sell"
-        assetName="SPDR S&P 500 ETF Trust"
-        assetSymbol="SPY"
+        assetName={STOCK_INFO[symbol]?.name}
+        assetSymbol={symbol}
         currentPrice={data?.currentPrice}
         quantity={quantity}
         onQuantityChange={setQuantity}

@@ -2,8 +2,45 @@
 import { useState, useEffect, useRef } from "react";
 import CryptoChart from "@/app/components/Crypto/CryptoChart";
 import CryptoData from "@/app/components/Crypto/CryptoData";
-import { executeTransaction } from "@/utils/transactions";
 import TransactionModal from "@/app/components/Transactions/TransactionModal";
+import { executeTransaction } from "@/utils/transactions";
+import { useParams } from "next/navigation";
+
+const CRYPTO_INFO = {
+  BTC: {
+    key: "BTC",
+    symbol: "BTCUSDT",
+    name: "Bitcoin (BTC-USD)",
+    description:
+      "The world's first and largest cryptocurrency — operates on a decentralized blockchain network, providing peer-to-peer transactions without intermediaries or central authority.",
+    longDescription:
+      'Created in 2009 by pseudonymous developer Satoshi Nakamoto, Bitcoin has a fixed supply cap of 21 million coins. It uses proof-of-work consensus to validate transactions and has become widely recognized as "digital gold" — a hedge against inflation and currency devaluation during economic uncertainty.',
+    coinName: "bitcoin",
+    apiSymbol:process.env.NEXT_PUBLIC_BITCOIN_SYMBOL
+  },
+  ETH: {
+    key: "ETH",
+    symbol: "ETHUSDT",
+    name: "Ethereum (ETH-USD)",
+    description:
+      "A decentralized blockchain platform that enables smart contracts and decentralized applications (dApps) to be built and run without downtime, fraud, control, or interference from a third party.",
+    longDescription:
+      "Launched in 2015, Ethereum introduced smart contract functionality to blockchain technology. It's transitioning from proof-of-work to proof-of-stake consensus with Ethereum 2.0, aiming to improve scalability, security, and sustainability. Ethereum hosts thousands of tokens and is the foundation of decentralized finance (DeFi) applications.",
+    coinName: "ethereum",
+    apiSymbol: process.env.NEXT_PUBLIC_ETHEREUM_SYMBOL
+  },
+  SOL: {
+    key: "SOL",
+    symbol: "SOLUSDT",
+    name: "Solana (SOL-USD)",
+    description:
+      "A high-performance blockchain supporting smart contracts and decentralized applications with an emphasis on speed and low transaction costs.",
+    longDescription:
+      "Launched in 2020, Solana uses a unique proof-of-history consensus combined with proof-of-stake to achieve high throughput (up to 65,000 transactions per second) and very low fees. Its ecosystem has grown rapidly with NFT marketplaces, DeFi protocols, and Web3 applications making it a popular alternative to Ethereum for developers and users seeking scalability.",
+    coinName: "solana",
+    apiSymbol: process.env.NEXT_PUBLIC_SOLANA_SYMBOL
+  },
+};
 
 type CryptoData = {
   symbol: string;
@@ -23,7 +60,10 @@ export interface CryptoDataProps {
   onDataUpdate: (newData: CryptoData) => void;
 }
 
-export default function ETHERIUM_PAGE() {
+export default function CryptoPage() {
+  const params = useParams();
+  const symbol = params.symbol as keyof typeof CRYPTO_INFO;
+
   const [data, setData] = useState<CryptoData | null>(null);
   const [chartData, setChartData] = useState<{ time: number; value: number }[]>(
     []
@@ -32,7 +72,7 @@ export default function ETHERIUM_PAGE() {
   const [isChartLoading, setIsChartLoading] = useState<boolean>(false);
   const [chartError, setChartError] = useState<string | null>(null);
   const lastSignificantPriceRef = useRef<number | null>(null);
-  const Name = "Ethereum (ETH-USD)";
+  const Name = CRYPTO_INFO[symbol]?.name;
   const [showMore, setShowMore] = useState(false);
   const lastUpdateRef = useRef<number>(0);
 
@@ -65,11 +105,11 @@ export default function ETHERIUM_PAGE() {
       }
 
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_CRYPTO_CHART_URL}/api/v3/coins/ethereum/market_chart?vs_currency=usd&days=${days}`
+        `${process.env.NEXT_PUBLIC_CRYPTO_CHART_URL}/api/v3/coins/${CRYPTO_INFO[symbol].coinName}/market_chart?vs_currency=usd&days=${days}`
       );
 
       if (!response.ok) {
-        throw new Error(`Ethereum API error! Status: ${response.status}`);
+        throw new Error(`Crypto API error! Status: ${response.status}`);
       }
 
       const data = await response.json();
@@ -88,7 +128,7 @@ export default function ETHERIUM_PAGE() {
         const percentChange24h = (change24h / yesterdayPrice) * 100;
 
         setData((prevData: CryptoData | null) => ({
-          symbol: "ETHUSDT",
+          symbol: symbol,
           currentPrice: latestPrice,
           change24h: change24h,
           percentChange24h: percentChange24h,
@@ -127,8 +167,8 @@ export default function ETHERIUM_PAGE() {
     quantity: string
   ) {
     await executeTransaction({
-      symbol: "ETH",
-      name: "Ethereum",
+      symbol: symbol,
+      name: CRYPTO_INFO[symbol]?.name,
       currentPrice,
       type: type as "buy" | "sell",
       quantity,
@@ -155,10 +195,8 @@ export default function ETHERIUM_PAGE() {
             Real-time cryptocurrency data, performance chart, and key metrics.
           </p>
           <div className="mt-3 mb-6 p-4 bg-zinc-800/50 rounded-md border border-zinc-700 text-zinc-300 text-sm">
-            <strong>About Ethereum:</strong>
-            The world's leading programmable blockchain — enables smart
-            contracts, decentralized applications (dApps), and the creation of
-            new cryptocurrencies through its platform.
+            <strong>{CRYPTO_INFO[symbol]?.name}</strong>
+            {CRYPTO_INFO[symbol]?.description}
             <button
               onClick={() => setShowMore(!showMore)}
               className="ml-2 text-amber-400 underline text-xs"
@@ -167,13 +205,7 @@ export default function ETHERIUM_PAGE() {
             </button>
             {showMore && (
               <p className="mt-2 text-xs text-zinc-400">
-                Launched in 2015 by Vitalik Buterin and team, Ethereum
-                revolutionized blockchain technology by introducing smart
-                contract functionality. After transitioning to proof-of-stake in
-                2022 (The Merge), it became more energy-efficient and
-                environmentally friendly. ETH is used for transaction fees
-                (gas), staking, and as a store of value in the growing DeFi
-                ecosystem.
+                {CRYPTO_INFO[symbol]?.longDescription}
               </p>
             )}
           </div>
@@ -187,7 +219,6 @@ export default function ETHERIUM_PAGE() {
             onTimeframeChange={setTimeframe}
             onRetry={() => fetchHistoricalData(timeframe)}
           />
-          
           <div className="flex space-x-4 mt-6 mb-6">
             <button
               onClick={() => setBuyModalOpen(true)}
@@ -235,7 +266,7 @@ export default function ETHERIUM_PAGE() {
           </div>
 
           <CryptoData
-            symbol={process.env.NEXT_PUBLIC_ETHERIUM_SYMBOL || "ETHUSDT"}
+            symbol={CRYPTO_INFO[symbol].apiSymbol ?? symbol}
             name={Name}
             onDataUpdate={(newData: CryptoData) => {
               setData(newData);
@@ -256,12 +287,13 @@ export default function ETHERIUM_PAGE() {
           />
         </div>
       </div>
+
       <TransactionModal
         isOpen={buyModalOpen}
         onClose={() => setBuyModalOpen(false)}
         type="buy"
-        assetName="Ethereum"
-        assetSymbol="ETH"
+        assetName={CRYPTO_INFO[symbol]?.name}
+        assetSymbol={symbol}
         currentPrice={data?.currentPrice}
         quantity={quantity}
         onQuantityChange={setQuantity}
@@ -275,8 +307,8 @@ export default function ETHERIUM_PAGE() {
         isOpen={sellModalOpen}
         onClose={() => setSellModalOpen(false)}
         type="sell"
-        assetName="Ethereum"
-        assetSymbol="ETH"
+        assetName={CRYPTO_INFO[symbol]?.name}
+        assetSymbol={symbol}
         currentPrice={data?.currentPrice}
         quantity={quantity}
         onQuantityChange={setQuantity}

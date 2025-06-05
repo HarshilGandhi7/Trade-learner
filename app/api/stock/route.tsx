@@ -4,11 +4,14 @@ export async function GET(request: Request) {
   const range = searchParams.get('range') || '1d';
   const symbol = searchParams.get('symbol') ;
 
+  console.log("Fetching stock data for symbol:", symbol, "interval:", interval, "range:", range);
+
   const res = await fetch(
     `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=${interval}&range=${range}&includePrePost=false`
   );
 
   const data = await res.json();
+  console.log("data", data);
   return new Response(JSON.stringify(data), {
     headers: { "Content-Type": "application/json" },
   });
