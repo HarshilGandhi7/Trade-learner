@@ -7,17 +7,11 @@ import {
 import { collection, doc, getDocs, setDoc } from "firebase/firestore";
 import Cookies from "js-cookie";
 import {
-  getAuth,
   EmailAuthProvider,
   updatePassword as firebaseUpdatePassword,
   reauthenticateWithCredential,
 } from "firebase/auth";
-
-type UserData = {
-  uid: string;
-  email: string;
-  username: string;
-};
+import { UserData } from "@/app/types";
 
 
 export const RegisterUser = async (

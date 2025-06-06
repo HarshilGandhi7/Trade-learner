@@ -5,66 +5,14 @@ import CryptoData from "@/app/components/Crypto/CryptoData";
 import TransactionModal from "@/app/components/Transactions/TransactionModal";
 import { executeTransaction } from "@/utils/transactions";
 import { useParams } from "next/navigation";
-
-const CRYPTO_INFO = {
-  BTC: {
-    key: "BTC",
-    symbol: "BTCUSDT",
-    name: "Bitcoin (BTC-USD)",
-    description:
-      "The world's first and largest cryptocurrency — operates on a decentralized blockchain network, providing peer-to-peer transactions without intermediaries or central authority.",
-    longDescription:
-      'Created in 2009 by pseudonymous developer Satoshi Nakamoto, Bitcoin has a fixed supply cap of 21 million coins. It uses proof-of-work consensus to validate transactions and has become widely recognized as "digital gold" — a hedge against inflation and currency devaluation during economic uncertainty.',
-    coinName: "bitcoin",
-    apiSymbol:process.env.NEXT_PUBLIC_BITCOIN_SYMBOL
-  },
-  ETH: {
-    key: "ETH",
-    symbol: "ETHUSDT",
-    name: "Ethereum (ETH-USD)",
-    description:
-      "A decentralized blockchain platform that enables smart contracts and decentralized applications (dApps) to be built and run without downtime, fraud, control, or interference from a third party.",
-    longDescription:
-      "Launched in 2015, Ethereum introduced smart contract functionality to blockchain technology. It's transitioning from proof-of-work to proof-of-stake consensus with Ethereum 2.0, aiming to improve scalability, security, and sustainability. Ethereum hosts thousands of tokens and is the foundation of decentralized finance (DeFi) applications.",
-    coinName: "ethereum",
-    apiSymbol: process.env.NEXT_PUBLIC_ETHEREUM_SYMBOL
-  },
-  SOL: {
-    key: "SOL",
-    symbol: "SOLUSDT",
-    name: "Solana (SOL-USD)",
-    description:
-      "A high-performance blockchain supporting smart contracts and decentralized applications with an emphasis on speed and low transaction costs.",
-    longDescription:
-      "Launched in 2020, Solana uses a unique proof-of-history consensus combined with proof-of-stake to achieve high throughput (up to 65,000 transactions per second) and very low fees. Its ecosystem has grown rapidly with NFT marketplaces, DeFi protocols, and Web3 applications making it a popular alternative to Ethereum for developers and users seeking scalability.",
-    coinName: "solana",
-    apiSymbol: process.env.NEXT_PUBLIC_SOLANA_SYMBOL
-  },
-};
-
-type CryptoData = {
-  symbol: string;
-  currentPrice: number;
-  change24h: number;
-  percentChange24h: number;
-  high24h: number;
-  low24h: number;
-  volume24h: number;
-  marketCap: number;
-  lastUpdate: number;
-};
-
-export interface CryptoDataProps {
-  symbol: string;
-  name: string;
-  onDataUpdate: (newData: CryptoData) => void;
-}
+import { CryptoDataType } from "@/app/types";
+import { CRYPTO_INFO } from "@/app/constants";
 
 export default function CryptoPage() {
   const params = useParams();
   const symbol = params.symbol as keyof typeof CRYPTO_INFO;
 
-  const [data, setData] = useState<CryptoData | null>(null);
+  const [data, setData] = useState<CryptoDataType | null>(null);
   const [chartData, setChartData] = useState<{ time: number; value: number }[]>(
     []
   );
@@ -127,7 +75,7 @@ export default function CryptoPage() {
         const change24h = latestPrice - yesterdayPrice;
         const percentChange24h = (change24h / yesterdayPrice) * 100;
 
-        setData((prevData: CryptoData | null) => ({
+        setData((prevData: CryptoDataType | null) => ({
           symbol: symbol,
           currentPrice: latestPrice,
           change24h: change24h,
@@ -268,7 +216,7 @@ export default function CryptoPage() {
           <CryptoData
             symbol={CRYPTO_INFO[symbol].apiSymbol ?? symbol}
             name={Name}
-            onDataUpdate={(newData: CryptoData) => {
+            onDataUpdate={(newData: CryptoDataType) => {
               setData(newData);
               if (timeframe === "1D") {
                 const now = Date.now();

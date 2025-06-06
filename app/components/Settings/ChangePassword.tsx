@@ -1,14 +1,12 @@
 import toast from "react-hot-toast";
 import { auth } from "../../../firebaseConfig";
 import { updatePassword } from "@/utils/auth";
+import { UserData } from "@/app/types";
 
-interface UserData {
-  uid: string;
-  email: string;
-  username: string;
-}
+
 
 export const ChangePassword = ({ userData }: { userData: UserData }) => {
+  
   const updateUserPassword = async () => {
     const newPasswordInput = document.getElementById(
       "new-password"

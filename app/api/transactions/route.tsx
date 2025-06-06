@@ -3,7 +3,6 @@ import { arrayUnion, doc, getDoc, updateDoc } from "firebase/firestore";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
-  console.log("Processing transaction request...");
   const { userId, transactionType, asset, quantity, price } = await req.json();
   try {
     const userRef = doc(db, "users", userId);

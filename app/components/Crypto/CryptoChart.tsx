@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useRef } from "react";
+import { CryptoChartProps } from "@/app/types";
 import {
   LineChart,
   Line,
@@ -7,20 +7,10 @@ import {
   YAxis,
   Tooltip,
   ResponsiveContainer,
-  ReferenceLine,
   Area,
 } from "recharts";
 
-interface CryptoChartProps {
-  chartData: { time: number; value: number }[];
-  timeframe: string;
-  isChartLoading: boolean;
-  chartError: string | null;
-  change24h?: number;
-  previousClose?: number;
-  onTimeframeChange: (timeframe: string) => void;
-  onRetry: () => void;
-}
+
 
 export default function CryptoChart({
   chartData,
@@ -29,7 +19,6 @@ export default function CryptoChart({
   chartError,
   change24h,
   onTimeframeChange,
-  onRetry,
 }: CryptoChartProps) {
   const isChartPositive =
     chartData.length > 1

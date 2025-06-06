@@ -674,7 +674,7 @@ app.get("/api/current/data/all", async (req, res) => {
       const marketKey = `market:${symbol}:current`;
       const marketData = await redisClient.hGetAll(marketKey);
       if (marketData && marketData.currentPrice) {
-        currentPrice[symbol.slice(0, 3)] = parseFloat(marketData.currentPrice);
+        currentPrice[symbol] = parseFloat(marketData.currentPrice);
       }
     }
 
@@ -682,11 +682,11 @@ app.get("/api/current/data/all", async (req, res) => {
       const cryptoKey = `crypto:${symbol}:current`;
       const cryptoData = await redisClient.hGetAll(cryptoKey);
       if (cryptoData && cryptoData.currentPrice) {
-        currentPrice[symbol.slice(0, 3)] =
+        currentPrice[symbol.slice(0,3)] =
           parseFloat(cryptoData.currentPrice) || 0;
       }
     }
-
+    console.log("Current prices fetched for all:", currentPrice);
     return res.status(200).json({
       success: true,
       data: currentPrice,

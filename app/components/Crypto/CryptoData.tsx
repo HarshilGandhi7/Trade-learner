@@ -1,11 +1,6 @@
 "use client";
+import { CryptoDataProps } from "@/app/types";
 import { useEffect, useRef, memo } from "react";
-
-interface CryptoDataProps {
-  symbol: string;
-  name: string;
-  onDataUpdate?: (data: any) => void;
-}
 
 function CryptoData({ symbol, name, onDataUpdate }: CryptoDataProps) {
   const dataRef = useRef({
@@ -27,7 +22,6 @@ function CryptoData({ symbol, name, onDataUpdate }: CryptoDataProps) {
   const barRef = useRef<HTMLDivElement>(null);
   const lastUpdateRef = useRef<HTMLParagraphElement>(null);
   const changeContainerRef = useRef<HTMLDivElement>(null);
-  const marketCapRef = useRef<HTMLDivElement>(null);
 
   const updateDOM = () => {
     const data = dataRef.current;

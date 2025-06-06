@@ -1,17 +1,8 @@
 "use client";
+import { TransactionData } from "@/app/types";
 import { getTransactionHistory } from "@/utils/transactions";
 import React, { useEffect, useState } from "react";
 
-export interface TransactionData {
-  data: string;
-  name: string;
-  price: number;
-  quantity: number;
-  symbol: string;
-  timestamp: number;
-  total: number;
-  type: string;
-}
 
 export const TransactionHistory = ({ userId }: { userId: string }) => {
   const [transactionHistory, setTransactionHistory] = useState<
@@ -194,7 +185,6 @@ export const TransactionHistory = ({ userId }: { userId: string }) => {
 
                 {Array.from({ length: totalPages }, (_, i) => i + 1)
                   .filter((page) => {
-                    // Show first page, last page, current page, and pages around current
                     return (
                       page === 1 ||
                       page === totalPages ||

@@ -1,5 +1,8 @@
 import { db } from "@/firebaseConfig";
 import { doc, getDoc } from "firebase/firestore";
+import { getCookie } from "@/utils/auth";
+import toast from "react-hot-toast";
+import { TransactionParams } from "@/app/types";
 
 export const getTransactionHistory = async (userId: string) => {
   try {
@@ -22,26 +25,13 @@ export const getTransactionHistory = async (userId: string) => {
   }
 };
 
-
-import { getCookie } from "@/utils/auth";
-import toast from "react-hot-toast";
-
-export interface TransactionParams {
-  symbol: string;
-  name: string;
-  currentPrice: number;
-  type: "buy" | "sell";
-  quantity: string;
-  setIsSubmitting?: (isSubmitting: boolean) => void;
-}
-
 export const executeTransaction = async ({
   symbol,
   name,
   currentPrice,
   type,
   quantity,
-  setIsSubmitting
+  setIsSubmitting,
 }: TransactionParams): Promise<boolean> => {
   if (
     !currentPrice ||
@@ -55,7 +45,7 @@ export const executeTransaction = async ({
 
   if (setIsSubmitting) setIsSubmitting(true);
   const userCookie = getCookie();
-  
+
   if (!userCookie?.uid) {
     toast.error("You must be logged in to make transactions.");
     if (setIsSubmitting) setIsSubmitting(false);
@@ -64,7 +54,7 @@ export const executeTransaction = async ({
 
   try {
     const response = await fetch(`/api/transactions`, {
-      method: 'POST',
+      method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
@@ -89,10 +79,16 @@ export const executeTransaction = async ({
 
     const responseData = await response.json();
     if (responseData.success) {
-      toast.success(`Successfully ${type === 'buy' ? 'bought' : 'sold'} ${quantity} ${symbol}`);
+      toast.success(
+        `Successfully ${
+          type === "buy" ? "bought" : "sold"
+        } ${quantity} ${symbol}`
+      );
       return true;
     } else {
-      toast.error(responseData.message || "Transaction failed. Please try again.");
+      toast.error(
+        responseData.message || "Transaction failed. Please try again."
+      );
       return false;
     }
   } catch (error) {

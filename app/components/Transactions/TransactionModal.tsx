@@ -1,19 +1,8 @@
 "use client";
 import { Fragment } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
+import { TransactionModalProps } from '@/app/types';
 
-interface TransactionModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  type: 'buy' | 'sell';
-  assetName: string;
-  assetSymbol: string;
-  currentPrice: number | undefined;
-  quantity: string;
-  onQuantityChange: (value: string) => void;
-  onConfirm: () => void;
-  isSubmitting: boolean;
-}
 
 export default function TransactionModal({
   isOpen,
@@ -152,7 +141,7 @@ export default function TransactionModal({
                           clipRule="evenodd"
                         />
                       </svg>
-                      This is a simulated transaction. No real cryptocurrency will be {isBuy ? 'purchased' : 'sold'}.
+                      This is a simulated transaction. No real assets will be {isBuy ? 'purchased' : 'sold'}.
                     </p>
                   </div>
                 </div>

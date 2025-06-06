@@ -6,14 +6,8 @@ import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { ChangePassword } from "../components/Settings/ChangePassword";
 import { TransactionHistory } from "../components/Transactions/TransactionHistory";
-import { Portpolio } from "../components/Portfolio/portfolio";
 import { Overview } from "../components/Overview/overview";
-
-interface UserData {
-  uid: string;
-  email: string;
-  username: string;
-}
+import { UserData } from "../types";
 
 const DashboardPage = () => {
   const [userData, setUserData] = useState<UserData | null>(null);
@@ -68,39 +62,29 @@ const DashboardPage = () => {
 
         <div className="mt-6 border-b border-zinc-700">
           <div className="flex space-x-8">
-            {["overview", "portfolio", "transactions", "settings"].map(
-              (tab) => (
-                <button
-                  key={tab}
-                  onClick={() => setActiveTab(tab)}
-                  className={`pb-4 px-1 text-sm font-medium ${
-                    activeTab === tab
-                      ? "text-amber-500 border-b-2 border-amber-500"
-                      : "text-zinc-400 hover:text-zinc-200"
-                  }`}
-                >
-                  {tab.charAt(0).toUpperCase() + tab.slice(1)}
-                </button>
-              )
-            )}
+            {["overview", "transactions"].map((tab) => (
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                className={`pb-4 px-1 text-sm font-medium ${
+                  activeTab === tab
+                    ? "text-amber-500 border-b-2 border-amber-500"
+                    : "text-zinc-400 hover:text-zinc-200"
+                }`}
+              >
+                {tab.charAt(0).toUpperCase() + tab.slice(1)}
+              </button>
+            ))}
           </div>
         </div>
 
         <div className="mt-8">
-          {activeTab === "overview" && userData &&  (
-          <Overview userId={userData?.uid.toString()}/>
-          )}
-
-          {activeTab === "portfolio" && userData &&  (
-            <Portpolio userId={userData?.uid.toString()} />
+          {activeTab === "overview" && userData && (
+            <Overview userId={userData?.uid.toString()} />
           )}
 
           {activeTab === "transactions" && userData && (
             <TransactionHistory userId={userData.uid.toString()} />
-          )}
-
-          {activeTab === "settings" && userData && (
-            <ChangePassword userData={userData} />
           )}
         </div>
       </div>

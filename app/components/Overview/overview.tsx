@@ -1,20 +1,11 @@
 "use client";
 import { getTransactionHistory } from "@/utils/transactions";
 import { useState, useEffect } from "react";
-import { TransactionData } from "../Transactions/TransactionHistory";
-import {
-  getAmountInvestedAndAmountLeft,
-  getCurrentValue,
-  getPortfolio,
-} from "@/utils/portfolio";
-import { PortfolioData } from "../Portfolio/portfolio";
+import { TransactionData } from "@/app/types";
+import { getAmountLeft, getTotals } from "@/utils/portfolio";
 
 export const Overview = ({ userId }: { userId: string }) => {
   const [ActivityHistory, setActivityHistory] = useState<TransactionData[]>([]);
-  const [portfolio, setPortfolio] = useState<PortfolioData[]>([]);
-  const [currentPrices, setCurrentPrices] = useState<Record<string, number>>(
-    {}
-  );
   const [amountInvested, setAmountInvested] = useState<string>("0.00");
   const [creditsLeft, setCreditsLeft] = useState<string>("0.00");
   const [portfolioValue, setPortfolioValue] = useState<string>("Nan");
@@ -34,53 +25,29 @@ export const Overview = ({ userId }: { userId: string }) => {
         setActivityHistory([]);
       }
     };
-    const fetchPortfolio = async () => {
-      try {
-        const data = await getPortfolio(userId);
-        setPortfolio(data);
-      } catch (error) {
-        console.error("Error fetching portfolio:", error);
+
+    const fetchCreditsLeft = async () => {
+      const credits = await getAmountLeft(userId);
+      if (credits) {
+        setCreditsLeft(credits);
       }
-    };
-    const fetchAmountInvestedAndCreditsLeft = async () => {
-      const [investedMoney, creditsLeft] = await getAmountInvestedAndAmountLeft(
-        userId
-      );
-      setAmountInvested(investedMoney);
-      setCreditsLeft(creditsLeft);
+    }
+    
+    const fetchTotals = async () => {
+      const result = await getTotals({ userId });
+      if (result) {
+        setPortfolioValue(result.totalCurrentValue.toFixed(2));
+        setAmountInvested(result.totalInvested.toFixed(2));
+        setTotalProfitLoss(result.totalProfitLoss);
+        setProfitLossPercent(result.totalProfitLossPercent);
+      }
     };
 
     fetchActivityHistory();
-    fetchAmountInvestedAndCreditsLeft();
-    fetchPortfolio();
-  }, [userId]);
-
-  useEffect(() => {
-    const updatePortfolioValue = async () => {
-      try {
-        const value = await getCurrentValue({ userId });
-        setPortfolioValue(value);
-
-        const profitLoss = Number(value) - Number(amountInvested);
-        setTotalProfitLoss(profitLoss);
-
-        const percent =
-          Number(amountInvested) > 0
-            ? (profitLoss / Number(amountInvested)) * 100
-            : 0;
-        setProfitLossPercent(percent);
-      } catch (error) {
-        console.error("Error updating portfolio value:", error);
-      }
-    };
-
-    // Initial update
-    updatePortfolioValue();
-
-    // Set up interval
-    const intervalId = setInterval(updatePortfolioValue, 10000);
+    fetchCreditsLeft();
+    const intervalId = setInterval(fetchTotals, 10000);
     return () => clearInterval(intervalId);
-  }, [userId, amountInvested]);
+  }, [userId]);
 
   return (
     <>
@@ -149,7 +116,6 @@ export const Overview = ({ userId }: { userId: string }) => {
         </div>
       </div>
 
-      {/* Recent Activity */}
       <div className="bg-zinc-800 rounded-lg border border-zinc-700 mb-8">
         <div className="p-6 border-b border-zinc-700">
           <h2 className="text-lg font-medium text-white">Recent Activity</h2>
