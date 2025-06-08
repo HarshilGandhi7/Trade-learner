@@ -38,10 +38,8 @@ export const TransactionHistory = ({ userId }: { userId: string }) => {
 
   useEffect(() => {
     const fetchTransactionHistory = async () => {
-      console.log("Fetching transaction history for user:", userId);
       const transactions = await getTransactionHistory(userId);
       if (transactions && transactions.length > 0) {
-        console.log("Fetched transactions:", transactions);
         setTransactionHistory(transactions);
       } else {
         setTransactionHistory([]);

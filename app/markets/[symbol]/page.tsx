@@ -122,7 +122,6 @@ export default function MarketPage() {
       }
 
       const data = await response.json();
-      console.log(data);
 
       const result = data?.chart?.result?.[0];
 

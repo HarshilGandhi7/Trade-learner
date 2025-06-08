@@ -21,7 +21,11 @@ export default function Home() {
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (sidebarRef.current && !sidebarRef.current.contains(event.target as Node) && sidebarOpen) {
+      if (
+        sidebarRef.current &&
+        !sidebarRef.current.contains(event.target as Node) &&
+        sidebarOpen
+      ) {
         setSidebarOpen(false);
       }
     }
@@ -63,7 +67,9 @@ export default function Home() {
             fill="currentColor"
           />
         </svg>
-        <span className="mt-4 text-lg text-zinc-300">Loading your dashboard...</span>
+        <span className="mt-4 text-lg text-zinc-300">
+          Loading your dashboard...
+        </span>
       </div>
     </div>
   ) : (
@@ -86,8 +92,8 @@ export default function Home() {
         <div className="flex items-center justify-between p-6 border-b border-zinc-700/50">
           <Link href="/" className="flex items-center space-x-3">
             <div className="w-10 h-10 rounded-xl bg-amber-600 flex items-center justify-center shadow-lg">
-              <svg 
-                xmlns="http://www.w3.org/2000/svg" 
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"
                 className="w-6 h-6 text-white"
                 fill="none"
@@ -103,7 +109,7 @@ export default function Home() {
               Trade<span className="text-amber-500">Learner</span>
             </h2>
           </Link>
-          
+
           <button
             onClick={() => setSidebarOpen(false)}
             className="md:hidden p-2 rounded-md text-zinc-400 hover:text-white hover:bg-zinc-700 transition-colors"
@@ -164,7 +170,7 @@ export default function Home() {
 
           {/* Markets Section */}
           <div className="mb-4">
-            <button 
+            <button
               onClick={() => setMarketDropdownOpen(!marketDropdownOpen)}
               className="w-full flex items-center justify-between px-4 py-3 text-base font-medium rounded-lg transition-colors text-white hover:bg-zinc-800"
             >
@@ -191,7 +197,9 @@ export default function Home() {
                 viewBox="0 0 24 24"
                 strokeWidth={1.5}
                 stroke="currentColor"
-                className={`w-4 h-4 transition-transform duration-200 ${marketDropdownOpen ? 'rotate-180' : ''}`}
+                className={`w-4 h-4 transition-transform duration-200 ${
+                  marketDropdownOpen ? "rotate-180" : ""
+                }`}
               >
                 <path
                   strokeLinecap="round"
@@ -200,8 +208,12 @@ export default function Home() {
                 />
               </svg>
             </button>
-            
-            <div className={`mt-1 ml-6 pl-2 border-l border-zinc-700/50 space-y-1 ${marketDropdownOpen ? 'block' : 'hidden'}`}>
+
+            <div
+              className={`mt-1 ml-6 pl-2 border-l border-zinc-700/50 space-y-1 ${
+                marketDropdownOpen ? "block" : "hidden"
+              }`}
+            >
               {STOCK_MARKETS.map((market) => (
                 <Link
                   key={market.symbol}
@@ -217,7 +229,7 @@ export default function Home() {
 
           {/* Crypto Section */}
           <div className="mb-4">
-            <button 
+            <button
               onClick={() => setCryptoDropdownOpen(!cryptoDropdownOpen)}
               className="w-full flex items-center justify-between px-4 py-3 text-base font-medium rounded-lg transition-colors text-white hover:bg-zinc-800"
             >
@@ -244,7 +256,9 @@ export default function Home() {
                 viewBox="0 0 24 24"
                 strokeWidth={1.5}
                 stroke="currentColor"
-                className={`w-4 h-4 transition-transform duration-200 ${cryptoDropdownOpen ? 'rotate-180' : ''}`}
+                className={`w-4 h-4 transition-transform duration-200 ${
+                  cryptoDropdownOpen ? "rotate-180" : ""
+                }`}
               >
                 <path
                   strokeLinecap="round"
@@ -253,22 +267,27 @@ export default function Home() {
                 />
               </svg>
             </button>
-            
-            <div className={`mt-1 ml-6 pl-2 border-l border-zinc-700/50 space-y-1 ${cryptoDropdownOpen ? 'block' : 'hidden'}`}>
+
+            <div
+              className={`mt-1 ml-6 pl-2 border-l border-zinc-700/50 space-y-1 ${
+                cryptoDropdownOpen ? "block" : "hidden"
+              }`}
+            >
               {CRYPTO_MARKETS.map((crypto) => (
                 <Link
                   key={crypto.symbol}
                   href={`/crypto/${crypto.symbol}`}
                   className="flex items-center px-4 py-2.5 text-base font-medium rounded-lg text-zinc-300 hover:bg-zinc-800 hover:text-white transition-colors"
                 >
-                  <span className={`w-2 h-2 rounded-full ${crypto.color} mr-3`}></span>
+                  <span
+                    className={`w-2 h-2 rounded-full ${crypto.color} mr-3`}
+                  ></span>
                   {crypto.name} ({crypto.symbol})
                 </Link>
               ))}
             </div>
           </div>
 
-          {/* Additional Navigation Links */}
           <div className="space-y-1 mb-4">
             <Link
               href="/learn"
@@ -290,7 +309,27 @@ export default function Home() {
               </svg>
               Learning Center
             </Link>
-            
+
+            <Link
+              href="/news"
+              className="flex items-center px-4 py-3 text-base font-medium rounded-lg text-white hover:bg-zinc-800 transition-colors"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.5}
+                stroke="currentColor"
+                className="w-5 h-5 mr-3 text-zinc-400"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M12 7.5h1.5m-1.5 3h1.5m-7.5 3h7.5m-7.5 3h7.5m3-9h3.375c.621 0 1.125.504 1.125 1.125V18a2.25 2.25 0 01-2.25 2.25M16.5 7.5V18a2.25 2.25 0 002.25 2.25M16.5 7.5V4.875c0-.621-.504-1.125-1.125-1.125H4.125C3.504 3.75 3 4.254 3 4.875V18a2.25 2.25 0 002.25 2.25h13.5M6 7.5h3v3H6v-3z"
+                />
+              </svg>
+              News
+            </Link>
             <Link
               href="/portfolio"
               className="flex items-center px-4 py-3 text-base font-medium rounded-lg text-white hover:bg-zinc-800 transition-colors"
@@ -338,7 +377,7 @@ export default function Home() {
               </svg>
               Add Credits
             </Link>
-            
+
             <Link
               href="/settings"
               className="flex items-center px-4 py-3 text-base font-medium rounded-lg transition-colors text-white hover:bg-zinc-800"
@@ -364,7 +403,7 @@ export default function Home() {
               </svg>
               Settings
             </Link>
-            
+
             {userData && (
               <button
                 onClick={() => {
@@ -427,7 +466,6 @@ export default function Home() {
                 </h1>
               </div>
 
-    
               {!userData ? (
                 <div className="flex items-center space-x-4">
                   <Link
@@ -446,7 +484,9 @@ export default function Home() {
               ) : (
                 <div className="flex items-center space-x-4">
                   <div className="hidden md:block text-right">
-                    <p className="text-white font-medium">{userData.username}</p>
+                    <p className="text-white font-medium">
+                      {userData.username}
+                    </p>
                   </div>
                   <div className="h-10 w-10 rounded-full bg-gradient-to-br from-amber-600 to-amber-700 flex items-center justify-center text-white font-bold">
                     {userData.username.charAt(0).toUpperCase()}
@@ -464,11 +504,16 @@ export default function Home() {
             <div className="text-center md:text-left md:flex md:items-center md:justify-between">
               <div className="md:max-w-xl">
                 <h1 className="text-4xl md:text-5xl font-bold text-white leading-tight">
-                  Master Trading in a <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-500 to-amber-400">Risk-Free</span> Environment
+                  Master Trading in a{" "}
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-500 to-amber-400">
+                    Risk-Free
+                  </span>{" "}
+                  Environment
                 </h1>
                 <p className="mt-6 text-xl text-zinc-300 leading-relaxed">
-                  Practice trading strategies with real-time market data and virtual credits. 
-                  Build your skills and confidence before entering the real market.
+                  Practice trading strategies with real-time market data and
+                  virtual credits. Build your skills and confidence before
+                  entering the real market.
                 </p>
                 {!userData && (
                   <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
@@ -483,27 +528,67 @@ export default function Home() {
                       className="px-8 py-4 bg-zinc-800 text-white rounded-xl border border-zinc-700 hover:bg-zinc-700 transition-all font-medium text-lg flex items-center justify-center"
                     >
                       <span>Learn More</span>
-                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 ml-2">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        strokeWidth={1.5}
+                        stroke="currentColor"
+                        className="w-5 h-5 ml-2"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M8.25 4.5l7.5 7.5-7.5 7.5"
+                        />
                       </svg>
                     </Link>
                   </div>
                 )}
-                
+
                 {userData && (
                   <div className="mt-8 inline-flex p-4 bg-zinc-800/80 border border-zinc-700 rounded-xl items-center">
                     <div className="h-12 w-12 rounded-xl bg-green-500/20 flex items-center justify-center text-green-500 mr-4">
-                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        strokeWidth={1.5}
+                        stroke="currentColor"
+                        className="w-6 h-6"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                        />
                       </svg>
                     </div>
                     <div>
-                      <p className="text-zinc-400 text-sm">Your trading account is active</p>
-                      <p className="text-white font-medium">Continue where you left off</p>
+                      <p className="text-zinc-400 text-sm">
+                        Your trading account is active
+                      </p>
+                      <p className="text-white font-medium">
+                        Continue where you left off
+                      </p>
                     </div>
-                    <Link href="/dashboard" className="ml-4 p-2 text-amber-500 hover:text-amber-400">
-                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                    <Link
+                      href="/dashboard"
+                      className="ml-4 p-2 text-amber-500 hover:text-amber-400"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        strokeWidth={1.5}
+                        stroke="currentColor"
+                        className="w-6 h-6"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M8.25 4.5l7.5 7.5-7.5 7.5"
+                        />
                       </svg>
                     </Link>
                   </div>
@@ -522,8 +607,7 @@ export default function Home() {
                     />
                   </div>
                   <div className="absolute -bottom-4 -right-4 bg-zinc-800 border border-zinc-700 rounded-xl p-3 shadow-lg">
-                    <div className="text-white font-medium">NASDAQ: QQQ</div>
-                    <div className="text-green-500 font-bold">$410.25 +1.2%</div>
+                    <div className="text-white font-medium">Market And Cryptos</div>
                   </div>
                 </div>
               </div>
@@ -555,7 +639,8 @@ export default function Home() {
                   Real-Time Simulation
                 </h3>
                 <p className="mt-2 text-center text-zinc-300">
-                  Practice with real market data and live prices without risking actual capital.
+                  Practice with real market data and live prices without risking
+                  actual capital.
                 </p>
               </div>
 
@@ -580,7 +665,8 @@ export default function Home() {
                   Learning Resources
                 </h3>
                 <p className="mt-2 text-center text-zinc-300">
-                  Access expert trading guides, strategies, and analysis techniques through interactive lessons.
+                  Access expert trading guides, strategies, and analysis
+                  techniques through interactive lessons.
                 </p>
               </div>
 
@@ -605,7 +691,8 @@ export default function Home() {
                   Performance Analytics
                 </h3>
                 <p className="mt-2 text-center text-zinc-300">
-                  Track your trading performance with detailed analytics and insights to improve your strategy.
+                  Track your trading performance with detailed analytics and
+                  insights to improve your strategy.
                 </p>
               </div>
             </div>
@@ -616,10 +703,14 @@ export default function Home() {
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-12">
               <h2 className="text-3xl font-bold text-white">
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-500 to-amber-400">Virtual Credits</span> System
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-500 to-amber-400">
+                  Virtual Credits
+                </span>{" "}
+                System
               </h2>
               <p className="mt-4 text-lg text-zinc-300 max-w-3xl mx-auto">
-                Trade with virtual credits that simulate real-world trading without any financial risk.
+                Trade with virtual credits that simulate real-world trading
+                without any financial risk.
               </p>
             </div>
 
@@ -649,7 +740,8 @@ export default function Home() {
                   10,000
                 </div>
                 <p className="mt-4 text-center text-zinc-300 relative">
-                  Start with 10,000 free credits when you sign up, equivalent to $10,000 in the real market.
+                  Start with 10,000 free credits when you sign up, equivalent to
+                  $10,000 in the real market.
                 </p>
               </div>
 
@@ -678,7 +770,8 @@ export default function Home() {
                   1:1
                 </div>
                 <p className="mt-4 text-center text-zinc-300 relative">
-                  Each credit equals $1 in market value, making it easy to understand your simulated performance.
+                  Each credit equals $1 in market value, making it easy to
+                  understand your simulated performance.
                 </p>
               </div>
 
@@ -707,7 +800,8 @@ export default function Home() {
                   1,000:$1
                 </div>
                 <p className="mt-4 text-center text-zinc-300 relative">
-                  Need more practice? Get 1,000 additional credits for each $1 spent to boost your trading portfolio.
+                  Need more practice? Get 1,000 additional credits for each $1
+                  spent to boost your trading portfolio.
                 </p>
               </div>
             </div>
@@ -732,7 +826,8 @@ export default function Home() {
                 Ready to start your trading journey?
               </h2>
               <p className="mt-4 text-lg text-zinc-300">
-                Join thousands of traders who are learning and practicing with our platform.
+                Join thousands of traders who are learning and practicing with
+                our platform.
               </p>
               <div className="mt-8 flex flex-col sm:flex-row justify-center gap-4">
                 <Link
@@ -758,8 +853,8 @@ export default function Home() {
               <div className="col-span-1 md:col-span-1">
                 <div className="flex items-center space-x-3">
                   <div className="w-10 h-10 rounded-xl bg-amber-600 flex items-center justify-center shadow-lg">
-                    <svg 
-                      xmlns="http://www.w3.org/2000/svg" 
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
                       viewBox="0 0 24 24"
                       className="w-6 h-6 text-white"
                       fill="none"
@@ -819,54 +914,103 @@ export default function Home() {
                   </a>
                 </div>
               </div>
-              
+
               <div className="col-span-1">
-                <h4 className="text-sm font-semibold text-zinc-300 uppercase tracking-wider">Markets</h4>
+                <h4 className="text-sm font-semibold text-zinc-300 uppercase tracking-wider">
+                  Markets
+                </h4>
                 <ul className="mt-4 space-y-2">
                   <li>
-                    <Link href="/markets/QQQ" className="text-zinc-400 hover:text-white transition-colors">QQQ</Link>
+                    <Link
+                      href="/markets/QQQ"
+                      className="text-zinc-400 hover:text-white transition-colors"
+                    >
+                      QQQ
+                    </Link>
                   </li>
                   <li>
-                    <Link href="/markets/AAPL" className="text-zinc-400 hover:text-white transition-colors">AAPL</Link>
+                    <Link
+                      href="/markets/AAPL"
+                      className="text-zinc-400 hover:text-white transition-colors"
+                    >
+                      AAPL
+                    </Link>
                   </li>
                   <li>
-                    <Link href="/markets/MSFT" className="text-zinc-400 hover:text-white transition-colors">MSFT</Link>
+                    <Link
+                      href="/markets/MSFT"
+                      className="text-zinc-400 hover:text-white transition-colors"
+                    >
+                      MSFT
+                    </Link>
                   </li>
                 </ul>
               </div>
-              
+
               <div className="col-span-1">
-                <h4 className="text-sm font-semibold text-zinc-300 uppercase tracking-wider">Crypto</h4>
+                <h4 className="text-sm font-semibold text-zinc-300 uppercase tracking-wider">
+                  Crypto
+                </h4>
                 <ul className="mt-4 space-y-2">
                   <li>
-                    <Link href="/crypto/BTC" className="text-zinc-400 hover:text-white transition-colors">Bitcoin</Link>
+                    <Link
+                      href="/crypto/BTC"
+                      className="text-zinc-400 hover:text-white transition-colors"
+                    >
+                      Bitcoin
+                    </Link>
                   </li>
                   <li>
-                    <Link href="/crypto/ETH" className="text-zinc-400 hover:text-white transition-colors">Ethereum</Link>
+                    <Link
+                      href="/crypto/ETH"
+                      className="text-zinc-400 hover:text-white transition-colors"
+                    >
+                      Ethereum
+                    </Link>
                   </li>
                   <li>
-                    <Link href="/crypto/SOL" className="text-zinc-400 hover:text-white transition-colors">Solana</Link>
+                    <Link
+                      href="/crypto/SOL"
+                      className="text-zinc-400 hover:text-white transition-colors"
+                    >
+                      Solana
+                    </Link>
                   </li>
                 </ul>
               </div>
-              
+
               <div className="col-span-1">
-                <h4 className="text-sm font-semibold text-zinc-300 uppercase tracking-wider">Account</h4>
+                <h4 className="text-sm font-semibold text-zinc-300 uppercase tracking-wider">
+                  Account
+                </h4>
                 <ul className="mt-4 space-y-2">
                   <li>
-                    <Link href="/dashboard" className="text-zinc-400 hover:text-white transition-colors">Dashboard</Link>
+                    <Link
+                      href="/dashboard"
+                      className="text-zinc-400 hover:text-white transition-colors"
+                    >
+                      Dashboard
+                    </Link>
                   </li>
                   <li>
-                    <Link href="/portfolio" className="text-zinc-400 hover:text-white transition-colors">Portfolio</Link>
+                    <Link
+                      href="/portfolio"
+                      className="text-zinc-400 hover:text-white transition-colors"
+                    >
+                      Portfolio
+                    </Link>
                   </li>
                   <li>
-                    <Link href="/learn" className="text-zinc-400 hover:text-white transition-colors">Learning Center</Link>
+                    <Link
+                      href="/learn"
+                      className="text-zinc-400 hover:text-white transition-colors"
+                    >
+                      Learning Center
+                    </Link>
                   </li>
                 </ul>
               </div>
             </div>
-            
-            
           </div>
         </footer>
       </div>

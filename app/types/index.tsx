@@ -63,8 +63,7 @@ export interface TransactionModalProps {
   isSubmitting: boolean;
 }
 
-
-export interface CryptoDataType  {
+export interface CryptoDataType {
   symbol: string;
   currentPrice: number;
   change24h: number;
@@ -74,11 +73,33 @@ export interface CryptoDataType  {
   volume24h: number;
   marketCap: number;
   lastUpdate: number;
-};
+}
 
 export interface PortfolioTotals {
   totalCurrentValue: number;
   totalInvested: number;
   totalProfitLoss: number;
   totalProfitLossPercent: number;
+}
+
+export interface NewsArticle {
+  uuid: string;
+  title: string;
+  description: string;
+  snippet: string;
+  url: string;
+  image_url: string;
+  published_at: string;
+  source: string;
+  relevance_score: number;
+  entities?: Array<any>;
+}
+
+export interface SymbolNews {
+  lastUpdated: string;
+  articles: NewsArticle[];
+}
+
+export interface NewsState {
+  [symbol: string]: SymbolNews | null;
 }

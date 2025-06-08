@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Trade learner App",
+  title: "Trading made Simple and Risk Free",
   description: "A Simple Trading App to learn trading concepts and strategies by applying them in a simulated environment.",
 };
 

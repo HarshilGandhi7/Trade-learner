@@ -4,6 +4,8 @@ const redis = require("redis");
 const cors = require("cors");
 const http = require("http");
 const fetch = require("node-fetch");
+const db = require("./firebaseAdmin").db;
+const admin = require("./firebaseAdmin").admin;
 
 require("dotenv").config();
 
@@ -609,6 +611,7 @@ async function updateCryptoData() {
 
 const connectionCheckIntervalCrypto = 30000;
 let connectionCheckIntervalIdCrypto;
+
 function setConnectionCrypto() {
   if (connectionCheckIntervalIdCrypto) {
     clearInterval(connectionCheckIntervalIdCrypto);
@@ -656,16 +659,6 @@ app.get("/api/crypto/data/:symbol", async (req, res) => {
   }
 });
 
-async function startServer() {
-  await connectToRedis();
-  setConnectionInterval();
-  setConnectionCrypto();
-
-  server.listen(process.env.PORT, () => {
-    console.log(`Server is running on port ${process.env.PORT}`);
-  });
-}
-
 app.get("/api/current/data/all", async (req, res) => {
   try {
     const currentPrice = {};
@@ -682,7 +675,7 @@ app.get("/api/current/data/all", async (req, res) => {
       const cryptoKey = `crypto:${symbol}:current`;
       const cryptoData = await redisClient.hGetAll(cryptoKey);
       if (cryptoData && cryptoData.currentPrice) {
-        currentPrice[symbol.slice(0,3)] =
+        currentPrice[symbol.slice(0, 3)] =
           parseFloat(cryptoData.currentPrice) || 0;
       }
     }
@@ -699,4 +692,191 @@ app.get("/api/current/data/all", async (req, res) => {
     });
   }
 });
+
+let dataCollectionInterval;
+const newFetchInterval = 2 * 60 * 60 * 1000;
+async function fetchAndStoreNews() {
+  try {
+
+    for (const symbol of Object.keys(MARKETS)) {
+      try {
+
+        const existingNewsDoc = await db
+          .collection("marketNews")
+          .doc(symbol)
+          .get();
+        const existingArticles = existingNewsDoc.exists
+          ? existingNewsDoc.data().articles || []
+          : [];
+
+        const existingTimestamps = new Map();
+        existingArticles.forEach((article) => {
+          existingTimestamps.set(article.url, article);
+        });
+
+        const response = await fetch(
+          `https://api.marketaux.com/v1/news/all?symbols=${symbol}&filter_entities=true&language=en&api_token=${process.env.MARKETAUX_API_KEY}`
+        );
+        console.log(response, `Fetching news for ${symbol}...`);
+
+        if (!response.ok) {
+          throw new Error(
+            `Failed to fetch news for ${symbol}: ${response.statusText}`
+          );
+        }
+
+        const data = await response.json();
+
+        if (!data || !data.data || !Array.isArray(data.data)) {
+          console.log(`No news data available for ${symbol}`);
+          continue;
+        }
+
+        const newArticles = data.data.map((article) => ({
+          uuid:
+            article.uuid ||
+            `${Date.now()}-${Math.random().toString(36).substring(2, 15)}`,
+          title: article.title,
+          description: article.description || "",
+          snippet: article.snippet || "",
+          url: article.url,
+          image_url: article.image_url || "",
+          published_at: article.published_at,
+          source: article.source,
+          relevance_score: article.relevance_score || 0,
+          entities: article.entities || [],
+        }));
+
+        const mergedArticles = [...existingArticles];
+
+        for (const article of newArticles) {
+          if (!existingTimestamps.has(article.url)) {
+            mergedArticles.push(article);
+          }
+        }
+
+        const sortedArticles = mergedArticles.sort((a, b) => {
+          return new Date(b.published_at) - new Date(a.published_at);
+        });
+
+        const top15Articles = sortedArticles.slice(0, 15);
+
+        const newArticleCount = top15Articles.filter(
+          (article) => !existingTimestamps.has(article.url)
+        ).length;
+
+        await db.collection("marketNews").doc(symbol).set({
+          symbol,
+          lastUpdated: admin.firestore.FieldValue.serverTimestamp(),
+          articles: top15Articles,
+        });
+
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+      } catch (error) {
+        console.error(`Error processing news for ${symbol}:`, error);
+      }
+    }
+  } catch (error) {
+    console.error("Error fetching news:", error);
+  }
+}
+
+async function cleanupOldNews() {
+  try {
+    console.log("Cleaning up old news articles...");
+
+    for (const symbol of Object.keys(MARKETS)) {
+      try {
+        const newsDoc = await db.collection("marketNews").doc(symbol).get();
+
+        if (!newsDoc.exists || !newsDoc.data().articles) {
+          continue;
+        }
+
+        const articles = newsDoc.data().articles;
+
+        if (articles.length > 15) {
+          const sortedArticles = articles.sort((a, b) => {
+            return new Date(b.published_at) - new Date(a.published_at);
+          });
+
+          const top15Articles = sortedArticles.slice(0, 15);
+
+          await db.collection("marketNews").doc(symbol).update({
+            articles: top15Articles,
+            lastCleaned: admin.firestore.FieldValue.serverTimestamp(),
+          });
+        }
+      } catch (error) {
+        console.error(`Error cleaning up news for ${symbol}:`, error);
+      }
+    }
+  } catch (error) {
+    console.error("Error in news cleanup:", error);
+  }
+}
+
+async function startNewsConnection() {
+  if (dataCollectionInterval) {
+    clearInterval(dataCollectionInterval);
+  }
+
+  await fetchAndStoreNews();
+  await cleanupOldNews();
+
+  dataCollectionInterval = setInterval(fetchAndStoreNews, newFetchInterval);
+}
+
+app.get("/api/news/:symbol", async (req, res) => {
+  const symbol = req.params.symbol.toUpperCase();
+  try {
+    const newsDoc = await db.collection("marketNews").doc(symbol).get();
+    if (newsDoc.exists) {
+      const news = newsDoc.data();
+      res
+        .status(200)
+        .json({
+          success: true,
+          articles: news.articles || [],
+        });
+    } else {
+      res
+        .status(404)
+        .json({ success: false, error: `No news found for ${symbol}` });
+    }
+  } catch (error) {
+    console.error(`Error fetching news for ${symbol}:`, error);
+    res.status(500).json({ success: false, error: "Failed to fetch news" });
+  }
+});
+
+async function startServer() {
+  await connectToRedis();
+  setConnectionInterval();
+  setConnectionCrypto();
+  startNewsConnection();
+
+  server.listen(process.env.PORT, () => {
+    console.log(`Server is running on port ${process.env.PORT}`);
+  });
+}
+
 startServer();
+
+app.get("/health", (req, res) => {
+  const healthData = {
+    status: "UP",
+    timestamp: new Date().toISOString(),
+    services: {
+      redis: redisClient && redisClient.isOpen ? "CONNECTED" : "DISCONNECTED",
+      binance: Object.keys(CRYPTOS).some(
+        (symbol) => BinanceConnectionsCrypto[symbol]
+      )
+        ? "CONNECTED"
+        : "DISCONNECTED",
+    },
+    uptime: process.uptime(),
+  };
+
+  res.status(200).json(healthData);
+});
